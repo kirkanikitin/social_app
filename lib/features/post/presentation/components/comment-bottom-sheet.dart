@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/post/domain/entities/comment.dart';
 import 'package:social_app/features/post/domain/entities/post.dart';
@@ -13,7 +12,6 @@ import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/profile/domain/entities/profile-user.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:social_app/home/presentation/components/more-menu.dart';
 import '../../../auth/domain/entities/app-user.dart';
 
 class CommentBottomSheet extends StatefulWidget {
@@ -263,26 +261,15 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                         'Comments',
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
+                      const SizedBox(height: 15),
                       SizedBox(
                         height: 400,
                         child: BlocBuilder<PostCubit, PostState>(
                           builder: (context, state) {
                             if (state is PostsLoading) {
-                              SizedBox(
-                                width: 200.0,
-                                height: 100.0,
-                                child: Shimmer.fromColors(
-                                  baseColor: Colors.red,
-                                  highlightColor: Colors.yellow,
-                                  child: const Text(
-                                    'Shimmer',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 40.0,
-                                      fontWeight:
-                                      FontWeight.bold,
-                                    ),
-                                  ),
+                              return Center(
+                                child:  CircularProgressIndicator(
+                                    color: Theme.of(context).colorScheme.inverseSurface
                                 ),
                               );
                             }

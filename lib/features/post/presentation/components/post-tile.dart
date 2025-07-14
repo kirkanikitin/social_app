@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/post/domain/entities/comment.dart';
 import 'package:social_app/features/post/domain/entities/post.dart';
 import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/profile/domain/entities/profile-user.dart';
