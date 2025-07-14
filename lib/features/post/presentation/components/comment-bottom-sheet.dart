@@ -429,6 +429,8 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                       TextFieldComment(
                         controller: widget.commentController,
                         addComment: () {
+                          if (widget.commentController.text.isEmpty) return;
+
                           final newComment = Comment(
                             id: DateTime.now().millisecondsSinceEpoch.toString(),
                             postId: widget.post.id,
@@ -438,9 +440,11 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                             timestamp: DateTime.now(),
                           );
 
-                          if (widget.commentController.text.isNotEmpty) {
-                            widget.addComment(newComment);
+                          if (mounted) {
+                            context.read<PostCubit>().addComment(widget.post.id, newComment);
                           }
+
+                          widget.commentController.clear();
                         },
                       ),
                     ],
