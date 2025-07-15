@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:social_app/features/profile/presentation/pages/post.dart';
+import 'package:social_app/features/profile/presentation/pages/post-profile.dart';
 
 class MyTabBar extends StatefulWidget {
-  const MyTabBar({super.key});
+  final String uidProfile;
+  const MyTabBar({super.key, required this.uidProfile});
 
   @override
   State<MyTabBar> createState() => _MyTabBarState();
@@ -61,11 +62,11 @@ class _MyTabBarState extends State<MyTabBar>
         ),
         SizedBox(
           width: double.maxFinite,
-          height: 300,
+          height: 500,
           child: TabBarView(
             controller: controller,
-            children:  const [
-              MyPost(),
+            children:  [
+              MyPost(uid: widget.uidProfile),
               Center(
                 child: Text(
                   'Cтраница на стадии разработки))',

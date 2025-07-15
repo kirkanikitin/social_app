@@ -54,9 +54,22 @@ class PostCubit extends Cubit<PostState> {
     } catch (e) {}
   }
 
+  void updatePostInState(Post updatedPost) {
+    final currentState = state;
+    if (currentState is PostsLoaded) {
+      final updatedPosts = currentState.posts.map((post) {
+        return post.id == updatedPost.id ? updatedPost : post;
+      }).toList();
+
+      emit(PostsLoaded(updatedPosts));
+    }
+  }
+
   Future<void> toggleLikePost(String postId, String userId) async {
     try {
-      await postRepo.toggleLikePost(postId, userId);
+      final updatedPost = await postRepo.toggleLikePost(postId, userId);
+
+      updatePostInState(updatedPost);
     } catch (e) {
       emit(PostsError('Failed to toggle like: $e'));
     }
