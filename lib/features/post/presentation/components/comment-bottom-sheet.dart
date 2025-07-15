@@ -38,6 +38,22 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   AppUser? currentUser;
   bool isOwnPost = false;
 
+  String timeAgo(DateTime dateTime) {
+    final Duration diff = DateTime.now().difference(dateTime);
+
+    if (diff.inSeconds < 60) {
+      return 'только что';
+    } else if (diff.inMinutes < 60) {
+      return '${diff.inMinutes} мин назад';
+    } else if (diff.inHours < 24) {
+      return '${diff.inHours} ч назад';
+    } else if (diff.inDays < 7) {
+      return '${diff.inDays} дн назад';
+    } else {
+      return DateFormat('dd.MM.yyyy').format(dateTime);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +78,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
 
   void showDeleteMenu(Comment comment) {
     final profileCubit = context.read<ProfileCubit>();
-    final formattedDate = DateFormat('dd.MM.yyyy HH:mm').format(comment.timestamp);
+    final formattedDate = timeAgo(comment.timestamp);
 
     showGeneralDialog(
       context: context,
@@ -287,8 +303,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                   itemCount: showCommentCount,
                                   itemBuilder: (context, index) {
                                     final comment = post.comments[index];
-                                    final formattedDate = DateFormat('dd.MM.yyyy HH:mm').format(comment.timestamp);
-
+                                    final formattedDate = timeAgo(comment.timestamp);
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                                       child: FutureBuilder<ProfileUser?>(
@@ -345,16 +360,32 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(
-                                                      formattedDate,
-                                                      style: TextStyle(
-                                                        fontSize: 13,
-                                                        fontWeight: FontWeight.w300,
-                                                        color: Theme
-                                                            .of(context)
-                                                            .colorScheme
-                                                            .inversePrimary,
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          comment.userName ?? 'null',
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: Theme
+                                                                .of(context)
+                                                                .colorScheme
+                                                                .secondaryFixed,
+                                                          ),
                                                       ),
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          formattedDate,
+                                                          style: TextStyle(
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.w300,
+                                                            color: Theme
+                                                                .of(context)
+                                                                .colorScheme
+                                                                .inversePrimary,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                     const SizedBox(height: 5),
                                                     Text(
@@ -378,13 +409,29 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                                       child: Column(
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          Text(
-                                                            formattedDate,
-                                                            style: TextStyle(
-                                                              fontSize: 13,
-                                                              fontWeight: FontWeight.w300,
-                                                              color: Theme.of(context).colorScheme.inversePrimary,
-                                                            ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                comment.userName ?? 'null',
+                                                                style: TextStyle(
+                                                                  fontSize: 15,
+                                                                  fontWeight: FontWeight.w700,
+                                                                  color: Theme
+                                                                      .of(context)
+                                                                      .colorScheme
+                                                                      .secondaryFixed,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              Text(
+                                                                formattedDate,
+                                                                style: TextStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight: FontWeight.w300,
+                                                                  color: Theme.of(context).colorScheme.inversePrimary,
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                           const SizedBox(height: 5),
                                                           Text(
