@@ -8,6 +8,7 @@ import 'package:social_app/features/post/domain/entities/post.dart';
 import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/profile/domain/entities/profile-user.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
 import 'package:social_app/home/presentation/components/more-menu.dart';
 import 'package:social_app/features/post/presentation/components/comment-bottom-sheet.dart';
 import '../../../auth/domain/entities/app-user.dart';
@@ -200,67 +201,74 @@ class _PostTileState extends State<PostTile> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 10),
-                postUser?.profileImageUrl != null ? CachedNetworkImage(
-                  imageUrl: postUser!.profileImageUrl,
-                  placeholder: (context, url) =>
-                      CircularProgressIndicator(color: Theme.of(context).colorScheme.inverseSurface),
-                  errorWidget: (context, url, error) =>
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border.all(
-                              color: Theme.of(context).colorScheme.inversePrimary
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(
+                  builder: (context) => ProfilePage(uid: widget.post.userId)
+                )
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  postUser?.profileImageUrl != null ? CachedNetworkImage(
+                    imageUrl: postUser!.profileImageUrl,
+                    placeholder: (context, url) =>
+                        CircularProgressIndicator(color: Theme.of(context).colorScheme.inverseSurface),
+                    errorWidget: (context, url, error) =>
+                        Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.inversePrimary
+                            ),
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          size: 37,
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                        ),
-                      ),
-                  imageBuilder: (context, imageProvider) =>
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
+                          child: Icon(
+                            Icons.person,
+                            size: 37,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                           ),
                         ),
+                    imageBuilder: (context, imageProvider) =>
+                        Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                  ) : Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.inversePrimary
                       ),
-                ) : Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.inversePrimary
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
-                    color: Theme.of(context).colorScheme.secondary,
+                    child: Icon(
+                      Icons.person,
+                      size: 37,
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.person,
-                    size: 37,
-                    color: Theme.of(context).colorScheme.inverseSurface,
+                  const SizedBox(width: 15),
+                  Text(
+                    widget.post.userName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 15),
-                Text(
-                  widget.post.userName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
             Row(
               children: [

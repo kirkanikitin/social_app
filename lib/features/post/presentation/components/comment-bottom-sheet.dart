@@ -111,7 +111,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return Center(
-                                child:  CircularProgressIndicator(
+                                child: CircularProgressIndicator(
                                     color: Theme.of(context).colorScheme.inverseSurface
                                 ),
                               );

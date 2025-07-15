@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:social_app/features/auth/domain/entities/app-user.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:social_app/features/post/presentation/components/post-tile.dart';
+import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
+import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
 import 'package:social_app/features/profile/presentation/components/bio-box.dart';
 import 'package:social_app/features/profile/presentation/components/button-page.dart';
@@ -31,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage>
   late final profileCubit = context.read<ProfileCubit>();
   late AppUser? currentUser = authCubit.currentUser;
   late TabController controller;
+  int postCount = 0;
 
   @override
   void initState() {
@@ -109,7 +113,7 @@ class _ProfilePageState extends State<ProfilePage>
                   ),
                 ),
               ),
-              body: Column(
+              body: ListView(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 35, left: 25),
@@ -184,6 +188,40 @@ class _ProfilePageState extends State<ProfilePage>
                   ),
                   const SizedBox(height: 25),
                   const MyTabBar(),
+                  BlocBuilder<PostCubit, PostState>(
+                      builder: (context, state) {
+                        if (state is PostsLoaded) {
+                          final userPosts = state.posts
+                              .where((post) => post.userId == widget.uid)
+                              .toList();
+                          postCount = userPosts.length;
+                          return ListView.builder(
+                              itemCount: postCount,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final post = userPosts[index];
+
+                                return PostTile(
+                                    post: post,
+                                    onDeletePressed: () =>
+                                        context.read<PostCubit>().deletePost(post.id),
+                                );
+                              }
+                          );
+                        } else if (state is PostsLoading) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                                color: Theme.of(context).colorScheme.inverseSurface
+                            ),
+                          );
+                        } else {
+                          return const Center(
+                            child: Text('No posts...'),
+                          );
+                        }
+                      }
+                  ),
                 ],
               ),
             );
