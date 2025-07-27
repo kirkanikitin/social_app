@@ -282,13 +282,16 @@ class _PostTileState extends State<PostTile> {
           ],
         ),
         const SizedBox(height: 10),
-        CachedNetworkImage(
-          imageUrl: widget.post.imageUrl,
-          height: 510,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => const SizedBox(height: 520),
-          errorWidget: (context, url, error) => const Icon(Icons.error_outline),
+        Hero(
+          tag: 'post_${widget.post.id}',
+          child: CachedNetworkImage(
+            imageUrl: widget.post.imageUrl,
+            height: 510,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => const SizedBox(height: 520),
+            errorWidget: (context, url, error) => const Icon(Icons.error_outline),
+          ),
         ),
         const SizedBox(height: 20),
         Row(

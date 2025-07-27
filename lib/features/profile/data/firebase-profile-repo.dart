@@ -12,12 +12,17 @@ class FirebaseProfileRepo implements ProfileRepo {
       if (userDoc.exists) {
         final userData = userDoc.data();
         if (userData != null) {
+          final followers = List<String>.from(userData['followers'] ?? []);
+          final following = List<String>.from(userData['following'] ?? []);
+
           return ProfileUser(
               uid: uid,
               email: userData['email'],
               name: userData['name'],
               bio: userData['bio'] ?? '',
               profileImageUrl: userData['profileImageUrl'].toString(),
+              followers: followers,
+              following: following
           );
         }
       }

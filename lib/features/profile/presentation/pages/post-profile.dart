@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../post/presentation/components/post-tile.dart';
+import 'package:social_app/features/profile/presentation/pages/post-profile-view.dart';
 import '../../../post/presentation/cubits/post-cubit.dart';
 import '../../../post/presentation/cubits/post-states.dart';
 
@@ -41,36 +41,23 @@ class _MyPostState extends State<MyPost> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => Scaffold(
-                        backgroundColor: Colors.white,
-                        appBar: AppBar(
-                          backgroundColor: Colors.white,
-                          elevation: 0,
-                          leading: const BackButton(color: Colors.black),
-                        ),
-                        body: SingleChildScrollView(
-                          child: PostTile(
-                            post: post,
-                            onDeletePressed: () {
-                              // можно удалить пост из списка, если нужно
-                              setState(() {
-                                userPosts.removeAt(index);
-                              });
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
+                      builder: (_) => PostPageView(
+                        posts: userPosts,
+                        initialIndex: index,
                       ),
                     ),
                   );
                 },
-                child: CachedNetworkImage(
-                  imageUrl: post.imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[300],
+                child: Hero(
+                  tag: 'post_${post.id}',
+                  child: CachedNetworkImage(
+                    imageUrl: post.imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[300],
+                    ),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               );
             },
