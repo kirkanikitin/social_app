@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:social_app/features/profile/domain/repos/profile-repo.dart';
 import '../domain/entities/profile-user.dart';
 
