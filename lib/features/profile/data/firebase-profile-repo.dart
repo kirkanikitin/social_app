@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:social_app/features/profile/domain/repos/profile-repo.dart';
 import '../domain/entities/profile-user.dart';
 
@@ -55,4 +56,41 @@ class FirebaseProfileRepo implements ProfileRepo {
       print('Ошибка при обновлении Firestorm: $e');
     }
   }
+
+  @override
+  Future<void> toggleFollow(String currentUid, String targetUid) async {
+    try {
+      final currentUserDoc =
+        await firebaseFirestore.collection('users').doc(currentUid).get();
+      final targetUserDoc =
+      await firebaseFirestore.collection('users').doc(targetUid).get();
+
+      if (currentUserDoc.exists && targetUserDoc.exists) {
+        final currentUserData = currentUserDoc.data();
+        final targetUserData = targetUserDoc.data();
+
+        if (currentUserData != null && targetUserData != null) {
+          final List<String> currentFollowing =
+              List<String>.from(currentUserData['following'] ?? []);
+
+          if (currentFollowing.contains(targetUid)) {
+            await firebaseFirestore.collection('users').doc(currentUid).update({
+              'following': FieldValue.arrayRemove([targetUid])
+            });
+            await firebaseFirestore.collection('users').doc(targetUid).update({
+              'followers': FieldValue.arrayRemove([currentUid])
+            });
+          }
+        } else {
+          await firebaseFirestore.collection('users').doc(currentUid).update({
+            'following': FieldValue.arrayUnion([targetUid])
+          });
+          await firebaseFirestore.collection('users').doc(targetUid).update({
+            'followers': FieldValue.arrayUnion([currentUid])
+          });
+        }
+      }
+    } catch (e) {}
+  }
+
 }
