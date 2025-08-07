@@ -4,9 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:social_app/features/auth/domain/entities/app-user.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/post/presentation/components/post-tile.dart';
-import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
-import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
 import 'package:social_app/features/profile/presentation/components/bio-box.dart';
 import 'package:social_app/features/profile/presentation/components/button-page.dart';
@@ -163,28 +160,49 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      children: [
-                        MyButtonPage(
-                          title: 'Edit Profile',
-                          onTab: () {
-                            PersistentNavBarNavigator.pushNewScreen(
-                              context,
-                              screen: EditProfilePage(user: user),
-                              withNavBar: false,
-                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                            );
-                          },
-                        ),
-                        MyButtonPage(
-                          title: 'Share your profile',
-                          onTab: () {},
-                        ),
-                      ],
+                  if (widget.uid == currentUser!.uid) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        children: [
+                          MyButtonPage(
+                            title: 'Edit Profile',
+                            onTab: () {
+                              PersistentNavBarNavigator.pushNewScreen(
+                                context,
+                                screen: EditProfilePage(user: user),
+                                withNavBar: false,
+                                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                              );
+                            },
+                          ),
+                          MyButtonPage(
+                            title: 'Share your profile',
+                            onTab: () {
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ] else ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        children: [
+                          MyButtonPage(
+                            title: 'Follow',
+                            onTab: () {
+                            },
+                          ),
+                          MyButtonPage(
+                            title: 'Message',
+                            onTab: () {
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 25),
                   MyTabBar(uidProfile: currentUser!.uid),
                 ],

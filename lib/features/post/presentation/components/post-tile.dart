@@ -283,7 +283,7 @@ class _PostTileState extends State<PostTile> {
         ),
         const SizedBox(height: 10),
         Hero(
-          tag: 'post_${widget.post.id}',
+          tag: 'edit_profile_image_${widget.post.id}',
           child: CachedNetworkImage(
             imageUrl: widget.post.imageUrl,
             height: 510,
