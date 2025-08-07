@@ -39,6 +39,7 @@ class _PostPageViewState extends State<PostPageView> {
           return SafeArea(
             child: PostTile(
               post: post,
+              showHero: true,
               onDeletePressed: () {
                 setState(() {
                   widget.posts.removeAt(index);

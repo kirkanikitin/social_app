@@ -67,7 +67,7 @@ class _MyTabBarState extends State<MyTabBar>
             controller: controller,
             children:  [
               MyPost(uid: widget.uidProfile),
-              Center(
+              const Center(
                 child: Text(
                   'Cтраница на стадии разработки))',
                   style: TextStyle(
@@ -76,7 +76,7 @@ class _MyTabBarState extends State<MyTabBar>
                   ),
                 ),
               ),
-              Center(
+              const Center(
                 child: Text(
                   'Cтраница на стадии разработки))',
                   style: TextStyle(
