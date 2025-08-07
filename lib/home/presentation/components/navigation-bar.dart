@@ -60,7 +60,7 @@ class _HomeNavBarState extends State<HomeNavBar> {
 
     List<Widget> _buildScreens() {
       return [
-        const HomePage(),
+        HomePage(controller: _controller,),
         const Placeholder(),
         Container(),
         ProfilePage(uid: uid ?? 'unknown'),

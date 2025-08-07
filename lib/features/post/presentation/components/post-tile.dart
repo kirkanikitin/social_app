@@ -19,11 +19,13 @@ class PostTile extends StatefulWidget {
   final Post post;
   final void Function()? onDeletePressed;
   final bool showHero;
+  final VoidCallback? goToOwnProfile;
   const PostTile({
     super.key,
     required this.post,
     required this.onDeletePressed,
     this.showHero = false,
+    this.goToOwnProfile,
   });
 
   @override
@@ -204,11 +206,18 @@ class _PostTileState extends State<PostTile> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             GestureDetector(
-              onTap: () => Navigator.push(
-                  context, MaterialPageRoute(
-                  builder: (context) => ProfilePage(uid: widget.post.userId)
-                )
-              ),
+              onTap: () {
+                if (isOwnPost) {
+                  widget.goToOwnProfile?.call();
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(uid: widget.post.userId),
+                    ),
+                  );
+                }
+              },
               child: Row(
                 children: [
                   const SizedBox(width: 10),

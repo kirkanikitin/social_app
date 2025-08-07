@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/post/presentation/components/post-tile.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final PersistentTabController controller;
+  const HomePage({super.key, required this.controller});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -73,6 +75,9 @@ class _HomePageState extends State<HomePage> {
                     return PostTile(
                       post: post,
                       onDeletePressed: () => deletePost(post.id),
+                      goToOwnProfile: () {
+                        widget.controller.index = 3;
+                      },
                     );
                   },
               );
