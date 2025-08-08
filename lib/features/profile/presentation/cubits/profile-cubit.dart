@@ -9,14 +9,22 @@ import '../../domain/entities/profile-user.dart';
 class ProfileCubit extends Cubit<ProfileState> {
   final ProfileRepo profileRepo;
   final StorageRepo storageRepo;
+  String? _currentUid;
 
   ProfileCubit({
     required this.profileRepo,
     required this.storageRepo,
   }) : super(ProfileInitial());
 
+  void clearProfile() {
+    _currentUid = null;
+    emit(ProfileInitial());
+  }
 
-  Future<void> fetchUserProfile(String uid) async {
+  Future<void> fetchUserProfile(String uid,  {bool forceRefresh = false}) async {
+    if (!forceRefresh && state is ProfileLoaded && _currentUid == uid) {
+      return;
+    }
     try {
       emit(ProfileLoading());
       final user = await profileRepo.fetchUserProfile(uid);
