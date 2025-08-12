@@ -19,9 +19,7 @@ class _MyPostState extends State<MyPost> {
     return BlocBuilder<PostCubit, PostState>(
       builder: (context, state) {
         if (state is PostsLoaded) {
-          final userPosts = state.posts
-              .where((post) => post.userId == widget.uid)
-              .toList();
+          final userPosts = context.read<PostCubit>().getPostsByUser(widget.uid);
 
           return GridView.builder(
             padding: EdgeInsets.zero,

@@ -9,6 +9,7 @@ import '../../domain/repos/post-repo.dart';
 class PostCubit extends Cubit<PostState> {
   final PostRepo postRepo;
   final StorageRepo storageRepo;
+  List<Post> allPosts = [];
 
   PostCubit({
     required this.postRepo,
@@ -38,13 +39,21 @@ class PostCubit extends Cubit<PostState> {
   }
 
   Future<void> fetchAllPosts() async {
+    emit(PostsLoading());
     try {
-      emit(PostsLoading());
-      final posts = await postRepo.fetchAllPosts();
-      emit(PostsLoaded(posts));
+      allPosts = await postRepo.fetchAllPosts();
+      emit(PostsLoaded(allPosts));
     } catch (e) {
-      emit(PostsError('Failed to fetch posts: $e'));
+      emit(PostsError('Failed to load posts'));
     }
+  }
+
+  List<Post> getPostsExcludingUser(String userId) {
+    return allPosts.where((post) => post.userId != userId).toList();
+  }
+
+  List<Post> getPostsByUser(String userId) {
+    return allPosts.where((post) => post.userId == userId).toList();
   }
 
   Future<void> deletePost(String postId) async {

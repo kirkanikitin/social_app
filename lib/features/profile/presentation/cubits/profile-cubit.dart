@@ -21,7 +21,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(ProfileInitial());
   }
 
-  Future<void> fetchUserProfile(String uid,  {bool forceRefresh = false}) async {
+  Future<void> fetchUserProfile(String uid, {bool forceRefresh = false}) async {
     if (!forceRefresh && state is ProfileLoaded && _currentUid == uid) {
       return;
     }
@@ -30,6 +30,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       final user = await profileRepo.fetchUserProfile(uid);
 
       if (user != null) {
+        _currentUid = uid;
         emit(ProfileLoaded(user));
       } else {
         emit(ProfileError('User not found'));

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/auth/data/firebase-auth-repo.dart';
@@ -13,8 +11,6 @@ import 'package:social_app/home/presentation/components/navigation-bar.dart';
 import 'package:social_app/themes/light-mode.dart';
 import 'features/auth/presentation/cubits/auth_cubit.dart';
 import 'features/auth/presentation/pages/auth-page.dart';
-import 'features/profile/domain/repos/profile-repo.dart';
-import 'home/presentation/pages/home-page.dart';
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -30,6 +26,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
         providers: [
           BlocProvider<AuthCubit>(
+              lazy: false,
               create: (context) => AuthCubit(authRepo: firebaseAuthRepo)..checkAuth(),
           ),
           BlocProvider<ProfileCubit>(
