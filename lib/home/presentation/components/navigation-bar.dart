@@ -6,6 +6,7 @@ import 'package:social_app/features/profile/presentation/pages/profile-page.dart
 import 'package:social_app/home/presentation/pages/home-page.dart';
 import '../../../features/auth/presentation/cubits/auth_cubit.dart';
 import '../../../features/profile/presentation/cubits/profile-cubit.dart';
+import '../../../features/profile/presentation/cubits/profile-states.dart';
 
 class HomeNavBar extends StatefulWidget {
   @override
@@ -95,8 +96,10 @@ class _HomeNavBarState extends State<HomeNavBar> {
               .currentUser!
               .uid;
 
-          profileCubit.clearProfile();
-          profileCubit.fetchUserProfile(uid, forceRefresh: true);
+          if (profileCubit.state is! ProfileLoaded ||
+              (profileCubit.state as ProfileLoaded).profileUser.uid != uid) {
+            profileCubit.fetchUserProfile(uid, forceRefresh: true);
+          }
         } else {
           setState(() {
             _controller.index = index;
