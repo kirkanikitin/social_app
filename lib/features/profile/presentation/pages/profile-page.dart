@@ -71,6 +71,7 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                       Row(
                         children: [
+                        if (widget.uid == currentUser!.uid) ...[
                           GestureDetector(
                             onTap: () {
                               PersistentNavBarNavigator.pushNewScreen(
@@ -103,6 +104,16 @@ class _ProfilePageState extends State<ProfilePage>
                               width: 30,
                             ),
                           ),
+                        ] else ...[
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Icon(
+                                Icons.more_horiz_rounded,
+                                color: Colors.black45,
+                                size: 27,
+                            ),
+                            ),
+                          ]
                         ],
                       ),
                     ],

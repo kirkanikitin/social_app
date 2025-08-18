@@ -65,7 +65,7 @@ class _HomeNavBarState extends State<HomeNavBar> {
         HomePage(controller: _controller,),
         const Placeholder(),
         Container(),
-        ProfilePage(uid: uid ?? 'unknown'),
+        ProfilePage(uid: uid),
       ];
     }
     return PersistentTabView(
