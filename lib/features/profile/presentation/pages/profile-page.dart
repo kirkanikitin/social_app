@@ -8,11 +8,12 @@ import 'package:social_app/features/post/presentation/pages/upload-post-page.dar
 import 'package:social_app/features/profile/presentation/components/bio-box.dart';
 import 'package:social_app/features/profile/presentation/components/button-page.dart';
 import 'package:social_app/features/profile/presentation/components/follow-button.dart';
+import 'package:social_app/features/profile/presentation/components/profile-stats.dart';
 import 'package:social_app/features/profile/presentation/components/tab-bar.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
 import 'package:social_app/features/profile/presentation/components/drawer.dart';
-
+import '../../../post/presentation/cubits/post-cubit.dart';
 import 'edit-profile-page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -79,6 +80,8 @@ class _ProfilePageState extends State<ProfilePage>
         builder: (context, state) {
           if (state is ProfileLoaded) {
             final user = state.profileUser;
+            final userPosts = context.watch<PostCubit>().getPostsByUser(widget.uid);
+            final postCount = userPosts.length;
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -187,6 +190,12 @@ class _ProfilePageState extends State<ProfilePage>
                                 ),
                               ),
                             ),
+                        ),
+                          const SizedBox(width: 20),
+                          ProfileStats(
+                            postCount: postCount,
+                            followerCount: user.followers.length,
+                            followingCount: user.following.length,
                         ),
                       ],
                     ),
