@@ -7,6 +7,7 @@ import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
 import 'package:social_app/features/profile/presentation/components/bio-box.dart';
 import 'package:social_app/features/profile/presentation/components/button-page.dart';
+import 'package:social_app/features/profile/presentation/components/follow-button.dart';
 import 'package:social_app/features/profile/presentation/components/tab-bar.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
@@ -43,6 +44,33 @@ class _ProfilePageState extends State<ProfilePage>
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  void followButtonPressed() {
+   final profileState = profileCubit.state;
+    if (profileState is! ProfileLoaded) {
+      return;
+    }
+    final profileUser = profileState.profileUser;
+    final isFollowing = profileUser.followers.contains(currentUser!.uid);
+
+    setState(() {
+      if (isFollowing) {
+        profileUser.followers.remove(currentUser!.uid);
+      } else {
+        profileUser.followers.add(currentUser!.uid);
+      }
+    });
+
+    profileCubit.toggleFollow(currentUser!.uid, widget.uid).catchError((error) {
+      setState(() {
+        if (isFollowing) {
+          profileUser.followers.add(currentUser!.uid);
+        } else {
+          profileUser.followers.remove(currentUser!.uid);
+        }
+      });
+    });
   }
 
   @override
@@ -188,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage>
                             },
                           ),
                           MyButtonPage(
-                            title: 'Share your profile',
+                            title: 'Share it',
                             onTab: () {
                             },
                           ),
@@ -200,10 +228,9 @@ class _ProfilePageState extends State<ProfilePage>
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: Row(
                         children: [
-                          MyButtonPage(
-                            title: 'Follow',
-                            onTab: () {
-                            },
+                          FollowButton(
+                            onPressed: followButtonPressed,
+                            isFollowing: user.followers.contains(currentUser!.uid),
                           ),
                           MyButtonPage(
                             title: 'Message',

@@ -70,7 +70,7 @@ class FirebaseProfileRepo implements ProfileRepo {
 
         if (currentUserData != null && targetUserData != null) {
           final List<String> currentFollowing =
-              List<String>.from(currentUserData['following'] ?? []);
+          List<String>.from(currentUserData['following'] ?? []);
 
           if (currentFollowing.contains(targetUid)) {
             await firebaseFirestore.collection('users').doc(currentUid).update({
@@ -79,14 +79,14 @@ class FirebaseProfileRepo implements ProfileRepo {
             await firebaseFirestore.collection('users').doc(targetUid).update({
               'followers': FieldValue.arrayRemove([currentUid])
             });
+          } else {
+            await firebaseFirestore.collection('users').doc(currentUid).update({
+              'following': FieldValue.arrayUnion([targetUid])
+            });
+            await firebaseFirestore.collection('users').doc(targetUid).update({
+              'followers': FieldValue.arrayUnion([currentUid])
+            });
           }
-        } else {
-          await firebaseFirestore.collection('users').doc(currentUid).update({
-            'following': FieldValue.arrayUnion([targetUid])
-          });
-          await firebaseFirestore.collection('users').doc(targetUid).update({
-            'followers': FieldValue.arrayUnion([currentUid])
-          });
         }
       }
     } catch (e) {}

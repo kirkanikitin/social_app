@@ -15,13 +15,13 @@ class MyButtonPage extends StatelessWidget {
       padding: const EdgeInsets.only(right: 15),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             color: Theme.of(context).colorScheme.secondary
         ),
         child: GestureDetector(
           onTap: onTab,
           child: Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 7, top: 7),
+            padding: const EdgeInsets.only(left: 40, right: 40, bottom: 6, top: 6),
             child: Text(
               title,
               style: const TextStyle(
