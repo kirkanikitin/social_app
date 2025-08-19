@@ -15,6 +15,8 @@ import 'package:social_app/features/post/presentation/components/comment-bottom-
 import '../../../auth/domain/entities/app-user.dart';
 import 'dart:ui';
 
+import '../../../profile/presentation/components/safe-image.dart';
+
 
 class PostTile extends StatefulWidget {
   final Post post;
@@ -222,54 +224,10 @@ class _PostTileState extends State<PostTile> {
               child: Row(
                 children: [
                   const SizedBox(width: 10),
-                  postUser?.profileImageUrl != null ? CachedNetworkImage(
-                    imageUrl: postUser!.profileImageUrl,
-                    placeholder: (context, url) =>
-                        CircularProgressIndicator(color: Theme.of(context).colorScheme.inverseSurface),
-                    errorWidget: (context, url, error) =>
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.inversePrimary
-                            ),
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            size: 37,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                        ),
-                    imageBuilder: (context, imageProvider) =>
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                  ) : Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                          color: Theme.of(context).colorScheme.inversePrimary
-                      ),
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    child: Icon(
-                      Icons.person,
-                      size: 37,
-                      color: Theme.of(context).colorScheme.inverseSurface,
-                    ),
+                  avatarFromUrl(
+                    context: context,
+                    url: postUser?.profileImageUrl,
+                    size: 50,
                   ),
                   const SizedBox(width: 15),
                   Text(
@@ -296,24 +254,24 @@ class _PostTileState extends State<PostTile> {
         const SizedBox(height: 10),
         widget.showHero
             ? Hero(
-                tag: 'post_${widget.post.id}',
-                child: CachedNetworkImage(
-                  imageUrl: widget.post.imageUrl,
-                  height: 510,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const SizedBox(height: 520),
-                  errorWidget: (context, url, error) => const Icon(Icons.error_outline),
-                ),
-              )
-            : CachedNetworkImage(
-                imageUrl: widget.post.imageUrl,
-                height: 510,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const SizedBox(height: 520),
-                errorWidget: (context, url, error) => const Icon(Icons.error_outline),
-              ),
+          tag: 'post_${widget.post.id}',
+          child: safeNetworkImage(
+            context: context,
+            url: widget.post.imageUrl,
+            height: 510,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            fallback: const Icon(Icons.error_outline),
+          ),
+        )
+            : safeNetworkImage(
+          context: context,
+          url: widget.post.imageUrl,
+          height: 510,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          fallback: const Icon(Icons.error_outline),
+        ),
         const SizedBox(height: 20),
         Row(
           children: [

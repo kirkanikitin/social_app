@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class FollowButton extends StatelessWidget {
   final void Function()? onPressed;
   final bool isFollowing;
+  final double leftRight;
 
   const FollowButton({
     super.key,
     required this.onPressed,
     required this.isFollowing,
+    required this.leftRight,
   });
 
   @override
@@ -24,7 +26,7 @@ class FollowButton extends StatelessWidget {
           child: GestureDetector(
             onTap: onPressed,
             child: Padding(
-              padding: const EdgeInsets.only(left: 40, right: 40, bottom: 6, top: 6),
+              padding: EdgeInsets.only(left: leftRight, right: leftRight, bottom: 6, top: 6),
               child: Text(
                 isFollowing ? 'Unfollow' : 'Follow',
                 style: TextStyle(

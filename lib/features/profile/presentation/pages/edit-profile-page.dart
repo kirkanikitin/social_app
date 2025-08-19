@@ -10,6 +10,8 @@ import 'package:social_app/features/profile/presentation/components/text-field-e
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
 
+import '../components/safe-image.dart';
+
 class EditProfilePage extends StatefulWidget {
   final ProfileUser user;
   const EditProfilePage({
@@ -126,36 +128,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   clipBehavior: Clip.hardEdge,
-                  child:
-                    (!kIsWeb && imagePickedFile != null)
-                      ? Image.file(
-                      File(imagePickedFile!.path!),
-                      fit: BoxFit.cover,
-                      )
-                      :
-                    (kIsWeb && webImage != null)
-                      ? Image.memory(webImage!,
-                        fit: BoxFit.cover,
-
-                    )
-                      :
-                    CachedNetworkImage(
-                      imageUrl: widget.user.profileImageUrl,
-                      placeholder: (context, url) =>
-                        CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.inverseSurface
-                        ),
-                      errorWidget: (context, url, error) =>
-                          Icon(
-                            Icons.person,
-                            size: 54,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                      imageBuilder: (context, imageProvider) => 
-                        Image(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
+                    child: (!kIsWeb && imagePickedFile != null)
+                        ? Image.file(File(imagePickedFile!.path!), fit: BoxFit.cover)
+                        : (kIsWeb && webImage != null)
+                        ? Image.memory(webImage!, fit: BoxFit.cover)
+                        : avatarFromUrl(
+                      context: context,
+                      url: widget.user.profileImageUrl,
+                      size: 100,
                     ),
               ),
             const SizedBox(height: 15),

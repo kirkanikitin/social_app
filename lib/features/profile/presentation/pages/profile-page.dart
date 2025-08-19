@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -14,7 +13,9 @@ import 'package:social_app/features/profile/presentation/cubits/profile-cubit.da
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
 import 'package:social_app/features/profile/presentation/components/drawer.dart';
 import '../../../post/presentation/cubits/post-cubit.dart';
+import '../components/safe-image.dart';
 import 'edit-profile-page.dart';
+import 'follower-page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String uid;
@@ -157,45 +158,26 @@ class _ProfilePageState extends State<ProfilePage>
                     padding: const EdgeInsets.only(top: 35, left: 25),
                     child: Row(
                       children: [
-                        CachedNetworkImage(
-                          imageUrl: user.profileImageUrl,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(color: Theme.of(context).colorScheme.inverseSurface),
-                          errorWidget: (context, url, error) =>
-                              Container(
-                                height: 92,
-                                width: 92,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.inversePrimary
-                                  ),
-                                  color: Theme.of(context).colorScheme.secondary,
-                                ),
-                                child: Icon(
-                                  Icons.person,
-                                  size: 54,
-                                  color: Theme.of(context).colorScheme.inverseSurface,
-                                ),
-                              ),
-                          imageBuilder: (context, imageProvider) =>
-                            Container(
-                              height: 92,
-                              width: 92,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                        avatarFromUrl(
+                          context: context,
+                          url: user.profileImageUrl,
+                          size: 92,
                         ),
                           const SizedBox(width: 20),
                           ProfileStats(
                             postCount: postCount,
                             followerCount: user.followers.length,
                             followingCount: user.following.length,
+                            onTap: () => PersistentNavBarNavigator.pushNewScreen(
+                              context,
+                              screen: FollowerPage(
+                                followers: user.followers,
+                                following: user.following,
+                                userName: user.name,
+                              ),
+                              withNavBar: false,
+                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                            ),
                         ),
                       ],
                     ),
@@ -215,6 +197,7 @@ class _ProfilePageState extends State<ProfilePage>
                         children: [
                           MyButtonPage(
                             title: 'Edit Profile',
+                            leftRight: 40,
                             onTab: () {
                               PersistentNavBarNavigator.pushNewScreen(
                                 context,
@@ -226,6 +209,7 @@ class _ProfilePageState extends State<ProfilePage>
                           ),
                           MyButtonPage(
                             title: 'Share it',
+                            leftRight: 40,
                             onTab: () {
                             },
                           ),
@@ -239,10 +223,12 @@ class _ProfilePageState extends State<ProfilePage>
                         children: [
                           FollowButton(
                             onPressed: followButtonPressed,
+                            leftRight: 40,
                             isFollowing: user.followers.contains(currentUser!.uid),
                           ),
                           MyButtonPage(
                             title: 'Message',
+                            leftRight: 40,
                             onTab: () {
                             },
                           ),
