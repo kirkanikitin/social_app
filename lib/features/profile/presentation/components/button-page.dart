@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class MyButtonPage extends StatelessWidget {
   final String title;
   final void Function()? onTab;
+  final double leftRight;
   const MyButtonPage({
     super.key,
     required this.title,
     required this.onTab,
+    required this.leftRight
   });
 
   @override
@@ -15,13 +17,13 @@ class MyButtonPage extends StatelessWidget {
       padding: const EdgeInsets.only(right: 15),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             color: Theme.of(context).colorScheme.secondary
         ),
         child: GestureDetector(
           onTap: onTab,
           child: Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 7, top: 7),
+            padding: EdgeInsets.only(left: leftRight, right: leftRight, bottom: 6, top: 6),
             child: Text(
               title,
               style: const TextStyle(

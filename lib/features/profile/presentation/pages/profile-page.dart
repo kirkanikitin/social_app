@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -7,12 +6,16 @@ import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
 import 'package:social_app/features/profile/presentation/components/bio-box.dart';
 import 'package:social_app/features/profile/presentation/components/button-page.dart';
+import 'package:social_app/features/profile/presentation/components/follow-button.dart';
+import 'package:social_app/features/profile/presentation/components/profile-stats.dart';
 import 'package:social_app/features/profile/presentation/components/tab-bar.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
 import 'package:social_app/features/profile/presentation/components/drawer.dart';
-
+import '../../../post/presentation/cubits/post-cubit.dart';
+import '../components/safe-image.dart';
 import 'edit-profile-page.dart';
+import 'follower-page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String uid;
@@ -45,12 +48,41 @@ class _ProfilePageState extends State<ProfilePage>
     super.dispose();
   }
 
+  void followButtonPressed() {
+   final profileState = profileCubit.state;
+    if (profileState is! ProfileLoaded) {
+      return;
+    }
+    final profileUser = profileState.profileUser;
+    final isFollowing = profileUser.followers.contains(currentUser!.uid);
+
+    setState(() {
+      if (isFollowing) {
+        profileUser.followers.remove(currentUser!.uid);
+      } else {
+        profileUser.followers.add(currentUser!.uid);
+      }
+    });
+
+    profileCubit.toggleFollow(currentUser!.uid, widget.uid).catchError((error) {
+      setState(() {
+        if (isFollowing) {
+          profileUser.followers.add(currentUser!.uid);
+        } else {
+          profileUser.followers.remove(currentUser!.uid);
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoaded) {
             final user = state.profileUser;
+            final userPosts = context.watch<PostCubit>().getPostsByUser(widget.uid);
+            final postCount = userPosts.length;
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -71,6 +103,7 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                       Row(
                         children: [
+                        if (widget.uid == currentUser!.uid) ...[
                           GestureDetector(
                             onTap: () {
                               PersistentNavBarNavigator.pushNewScreen(
@@ -103,51 +136,57 @@ class _ProfilePageState extends State<ProfilePage>
                               width: 30,
                             ),
                           ),
+                        ] else ...[
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Icon(
+                                Icons.more_horiz_rounded,
+                                color: Colors.black45,
+                                size: 27,
+                            ),
+                            ),
+                          ]
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              body: Column(
+              body: ListView(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 35, left: 25),
                     child: Row(
                       children: [
-                        CachedNetworkImage(
-                          imageUrl: user.profileImageUrl,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(color: Theme.of(context).colorScheme.inverseSurface),
-                          errorWidget: (context, url, error) =>
-                              Container(
-                                height: 92,
-                                width: 92,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.inversePrimary
-                                  ),
-                                  color: Theme.of(context).colorScheme.secondary,
+                        avatarFromUrl(
+                          context: context,
+                          url: user.profileImageUrl,
+                          size: 92,
+                        ),
+                          const SizedBox(width: 20),
+                          ProfileStats(
+                            postCount: postCount,
+                            followerCount: user.followers.length,
+                            followingCount: user.following.length,
+                            onTap: () async {
+                              final result = await PersistentNavBarNavigator.pushNewScreen(
+                                context,
+                                screen: FollowerPage(
+                                  followers: user.followers,
+                                  following: user.following,
+                                  userName: user.name,
                                 ),
-                                child: Icon(
-                                  Icons.person,
-                                  size: 54,
-                                  color: Theme.of(context).colorScheme.inverseSurface,
-                                ),
-                              ),
-                          imageBuilder: (context, imageProvider) =>
-                            Container(
-                              height: 92,
-                              width: 92,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                                withNavBar: false,
+                                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                              );
+
+                              final removed = result as List<String>?; // <-- тут уже преобразуем
+                              if (removed != null && removed.isNotEmpty && mounted) {
+                                setState(() {
+                                  user.following.removeWhere((uid) => removed.contains(uid));
+                                });
+                              }
+                            },
                         ),
                       ],
                     ),
@@ -160,30 +199,54 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      children: [
-                        MyButtonPage(
-                          title: 'Edit Profile',
-                          onTab: () {
-                            PersistentNavBarNavigator.pushNewScreen(
-                              context,
-                              screen: EditProfilePage(user: user),
-                              withNavBar: false,
-                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                            );
-                          },
-                        ),
-                        MyButtonPage(
-                          title: 'Share your profile',
-                          onTab: () {},
-                        ),
-                      ],
+                  if (widget.uid == currentUser!.uid) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        children: [
+                          MyButtonPage(
+                            title: 'Edit Profile',
+                            leftRight: 40,
+                            onTab: () {
+                              PersistentNavBarNavigator.pushNewScreen(
+                                context,
+                                screen: EditProfilePage(user: user),
+                                withNavBar: false,
+                                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                              );
+                            },
+                          ),
+                          MyButtonPage(
+                            title: 'Share it',
+                            leftRight: 40,
+                            onTab: () {
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ] else ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        children: [
+                          FollowButton(
+                            onPressed: followButtonPressed,
+                            leftRight: 40,
+                            isFollowing: user.followers.contains(currentUser!.uid),
+                          ),
+                          MyButtonPage(
+                            title: 'Message',
+                            leftRight: 40,
+                            onTab: () {
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 25),
-                  const MyTabBar(),
+                  MyTabBar(uidProfile: widget.uid),
                 ],
               ),
             );

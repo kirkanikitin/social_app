@@ -1,9 +1,6 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +8,8 @@ import 'package:social_app/features/profile/domain/entities/profile-user.dart';
 import 'package:social_app/features/profile/presentation/components/text-field-edit.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
+
+import '../components/safe-image.dart';
 
 class EditProfilePage extends StatefulWidget {
   final ProfileUser user;
@@ -128,36 +127,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   clipBehavior: Clip.hardEdge,
-                  child:
-                    (!kIsWeb && imagePickedFile != null)
-                      ? Image.file(
-                      File(imagePickedFile!.path!),
-                      fit: BoxFit.cover,
-                      )
-                      :
-                    (kIsWeb && webImage != null)
-                      ? Image.memory(webImage!,
-                        fit: BoxFit.cover,
-
-                    )
-                      :
-                    CachedNetworkImage(
-                      imageUrl: widget.user.profileImageUrl,
-                      placeholder: (context, url) =>
-                        CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.inverseSurface
-                        ),
-                      errorWidget: (context, url, error) =>
-                          Icon(
-                            Icons.person,
-                            size: 54,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                      imageBuilder: (context, imageProvider) => 
-                        Image(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
+                    child: (!kIsWeb && imagePickedFile != null)
+                        ? Image.file(File(imagePickedFile!.path!), fit: BoxFit.cover)
+                        : (kIsWeb && webImage != null)
+                        ? Image.memory(webImage!, fit: BoxFit.cover)
+                        : avatarFromUrl(
+                      context: context,
+                      url: widget.user.profileImageUrl,
+                      size: 100,
                     ),
               ),
             const SizedBox(height: 15),

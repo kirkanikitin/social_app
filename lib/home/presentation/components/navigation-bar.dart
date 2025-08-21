@@ -5,6 +5,8 @@ import 'package:social_app/features/post/presentation/pages/upload-post-page.dar
 import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
 import 'package:social_app/home/presentation/pages/home-page.dart';
 import '../../../features/auth/presentation/cubits/auth_cubit.dart';
+import '../../../features/profile/presentation/cubits/profile-cubit.dart';
+import '../../../features/profile/presentation/cubits/profile-states.dart';
 
 class HomeNavBar extends StatefulWidget {
   @override
@@ -60,10 +62,10 @@ class _HomeNavBarState extends State<HomeNavBar> {
 
     List<Widget> _buildScreens() {
       return [
-        const HomePage(),
+        HomePage(controller: _controller,),
         const Placeholder(),
         Container(),
-        ProfilePage(uid: uid ?? 'unknown'),
+        ProfilePage(uid: uid),
       ];
     }
     return PersistentTabView(
@@ -87,6 +89,17 @@ class _HomeNavBarState extends State<HomeNavBar> {
             ),
           );
           _controller.index = 0;
+        } else if (index == 3) {
+          final profileCubit = context.read<ProfileCubit>();
+          final uid = context
+              .read<AuthCubit>()
+              .currentUser!
+              .uid;
+
+          if (profileCubit.state is! ProfileLoaded ||
+              (profileCubit.state as ProfileLoaded).profileUser.uid != uid) {
+            profileCubit.fetchUserProfile(uid, forceRefresh: true);
+          }
         } else {
           setState(() {
             _controller.index = index;

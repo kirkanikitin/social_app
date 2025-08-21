@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/post/domain/entities/comment.dart';
 import 'package:social_app/features/post/presentation/cubits/post-states.dart';
@@ -10,6 +9,7 @@ import '../../domain/repos/post-repo.dart';
 class PostCubit extends Cubit<PostState> {
   final PostRepo postRepo;
   final StorageRepo storageRepo;
+  List<Post> allPosts = [];
 
   PostCubit({
     required this.postRepo,
@@ -39,13 +39,21 @@ class PostCubit extends Cubit<PostState> {
   }
 
   Future<void> fetchAllPosts() async {
+    emit(PostsLoading());
     try {
-      emit(PostsLoading());
-      final posts = await postRepo.fetchAllPosts();
-      emit(PostsLoaded(posts));
+      allPosts = await postRepo.fetchAllPosts();
+      emit(PostsLoaded(allPosts));
     } catch (e) {
-      emit(PostsError('Failed to fetch posts: $e'));
+      emit(PostsError('Failed to load posts'));
     }
+  }
+
+  List<Post> getPostsExcludingUser(String userId) {
+    return allPosts.where((post) => post.userId != userId).toList();
+  }
+
+  List<Post> getPostsByUser(String userId) {
+    return allPosts.where((post) => post.userId == userId).toList();
   }
 
   Future<void> deletePost(String postId) async {
@@ -54,9 +62,22 @@ class PostCubit extends Cubit<PostState> {
     } catch (e) {}
   }
 
+  void updatePostInState(Post updatedPost) {
+    final currentState = state;
+    if (currentState is PostsLoaded) {
+      final updatedPosts = currentState.posts.map((post) {
+        return post.id == updatedPost.id ? updatedPost : post;
+      }).toList();
+
+      emit(PostsLoaded(updatedPosts));
+    }
+  }
+
   Future<void> toggleLikePost(String postId, String userId) async {
     try {
-      await postRepo.toggleLikePost(postId, userId);
+      final updatedPost = await postRepo.toggleLikePost(postId, userId);
+
+      updatePostInState(updatedPost);
     } catch (e) {
       emit(PostsError('Failed to toggle like: $e'));
     }

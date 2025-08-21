@@ -1,28 +1,35 @@
 import 'dart:typed_data';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/profile/domain/repos/profile-repo.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
 import 'package:social_app/features/storage/domain/storage-repo.dart';
-
 import '../../domain/entities/profile-user.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   final ProfileRepo profileRepo;
   final StorageRepo storageRepo;
+  String? _currentUid;
 
   ProfileCubit({
     required this.profileRepo,
     required this.storageRepo,
   }) : super(ProfileInitial());
 
+  void clearProfile() {
+    _currentUid = null;
+    emit(ProfileInitial());
+  }
 
-  Future<void> fetchUserProfile(String uid) async {
+  Future<void> fetchUserProfile(String uid, {bool forceRefresh = false}) async {
+    if (!forceRefresh && state is ProfileLoaded && _currentUid == uid) {
+      return;
+    }
     try {
       emit(ProfileLoading());
       final user = await profileRepo.fetchUserProfile(uid);
 
       if (user != null) {
+        _currentUid = uid;
         emit(ProfileLoaded(user));
       } else {
         emit(ProfileError('User not found'));
@@ -78,6 +85,14 @@ class ProfileCubit extends Cubit<ProfileState> {
       await fetchUserProfile(uid);
     } catch (e) {
       emit(ProfileError('Error updating profile: $e'));
+    }
+  }
+
+  Future<void> toggleFollow(String currentUserId, String targetUserId) async {
+    try {
+      await profileRepo.toggleFollow(currentUserId, targetUserId);
+    } catch (e) {
+      emit(ProfileError('Error toggling follow: $e'));
     }
   }
 }

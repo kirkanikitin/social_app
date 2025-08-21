@@ -11,8 +11,8 @@ import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/profile/domain/entities/profile-user.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../auth/domain/entities/app-user.dart';
+import '../../../profile/presentation/components/safe-image.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   final Post post;
@@ -111,7 +111,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return Center(
-                                child:  CircularProgressIndicator(
+                                child: CircularProgressIndicator(
                                     color: Theme.of(context).colorScheme.inverseSurface
                                 ),
                               );
@@ -126,29 +126,10 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Аватар
-                                CachedNetworkImage(
-                                  imageUrl: user.profileImageUrl,
-                                  imageBuilder: (context, imageProvider) => Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  placeholder: (context, url) => const CircleAvatar(radius: 25),
-                                  errorWidget: (context, url, error) => Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.grey[300],
-                                    ),
-                                    child: const Icon(Icons.person, size: 30),
-                                  ),
+                                avatarFromUrl(
+                                  context: context,
+                                  url: user.profileImageUrl,
+                                  size: 40,
                                 ),
                                 const SizedBox(width: 15),
                                 // Текст комментария и дата
@@ -328,31 +309,10 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                           return Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              CachedNetworkImage(
-                                                imageUrl: user.profileImageUrl,
-                                                imageBuilder: (context, imageProvider) =>
-                                                    Container(
-                                                      height: 50,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        image: DecorationImage(
-                                                          image: imageProvider,
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                placeholder: (context, url) => const CircleAvatar(radius: 25),
-                                                errorWidget: (context, url, error) =>
-                                                    Container(
-                                                      height: 50,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: Colors.grey[300],
-                                                      ),
-                                                      child: const Icon(Icons.person, size: 30),
-                                                    ),
+                                              avatarFromUrl(
+                                                context: context,
+                                                url: user.profileImageUrl,
+                                                size: 50,
                                               ),
                                               const SizedBox(width: 15),
                                               if (comment.userId != widget.currentUser.uid)

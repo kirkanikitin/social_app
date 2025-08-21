@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/post/presentation/components/post-tile.dart';
+import '../../../features/auth/presentation/cubits/auth_cubit.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final PersistentTabController controller;
+  const HomePage({super.key, required this.controller});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -60,19 +63,23 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             } else if (state is PostsLoaded) {
-              final allPosts = state.posts;
-              if (allPosts.isEmpty) {
+              final currentUserId = context.read<AuthCubit>().currentUser!.uid;
+              final posts = context.read<PostCubit>().getPostsExcludingUser(currentUserId);
+              if (posts.isEmpty) {
                 return const Center(
                   child: Text('No post available'),
                 );
               }
               return ListView.builder(
-                itemCount: allPosts.length,
+                itemCount: posts.length,
                 itemBuilder: (context, index) {
-                    final post = allPosts[index];
+                    final post = posts[index];
                     return PostTile(
                       post: post,
                       onDeletePressed: () => deletePost(post.id),
+                      goToOwnProfile: () {
+                        widget.controller.index = 3;
+                      },
                     );
                   },
               );

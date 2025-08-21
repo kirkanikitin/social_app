@@ -1,26 +1,33 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/post/domain/entities/post.dart';
 import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/profile/domain/entities/profile-user.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
 import 'package:social_app/home/presentation/components/more-menu.dart';
 import 'package:social_app/features/post/presentation/components/comment-bottom-sheet.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import 'dart:ui';
 
+import '../../../profile/presentation/components/safe-image.dart';
+
 
 class PostTile extends StatefulWidget {
   final Post post;
   final void Function()? onDeletePressed;
+  final bool showHero;
+  final VoidCallback? goToOwnProfile;
   const PostTile({
     super.key,
     required this.post,
     required this.onDeletePressed,
+    this.showHero = false,
+    this.goToOwnProfile,
   });
 
   @override
@@ -200,67 +207,37 @@ class _PostTileState extends State<PostTile> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 10),
-                postUser?.profileImageUrl != null ? CachedNetworkImage(
-                  imageUrl: postUser!.profileImageUrl,
-                  placeholder: (context, url) =>
-                      CircularProgressIndicator(color: Theme.of(context).colorScheme.inverseSurface),
-                  errorWidget: (context, url, error) =>
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          border: Border.all(
-                              color: Theme.of(context).colorScheme.inversePrimary
-                          ),
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          size: 37,
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                        ),
-                      ),
-                  imageBuilder: (context, imageProvider) =>
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                ) : Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.inversePrimary
+            GestureDetector(
+              onTap: () {
+                if (isOwnPost) {
+                  widget.goToOwnProfile?.call();
+                } else {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: ProfilePage(uid: widget.post.userId),
+                    withNavBar: false,
+                    pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                  );
+                }
+              },
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  avatarFromUrl(
+                    context: context,
+                    url: postUser?.profileImageUrl,
+                    size: 50,
+                  ),
+                  const SizedBox(width: 15),
+                  Text(
+                    widget.post.userName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
-                    color: Theme.of(context).colorScheme.secondary,
                   ),
-                  child: Icon(
-                    Icons.person,
-                    size: 37,
-                    color: Theme.of(context).colorScheme.inverseSurface,
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Text(
-                  widget.post.userName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
             Row(
               children: [
@@ -274,13 +251,25 @@ class _PostTileState extends State<PostTile> {
           ],
         ),
         const SizedBox(height: 10),
-        CachedNetworkImage(
-          imageUrl: widget.post.imageUrl,
+        widget.showHero
+            ? Hero(
+          tag: 'post_${widget.post.id}',
+          child: safeNetworkImage(
+            context: context,
+            url: widget.post.imageUrl,
+            height: 510,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            fallback: const Icon(Icons.error_outline),
+          ),
+        )
+            : safeNetworkImage(
+          context: context,
+          url: widget.post.imageUrl,
           height: 510,
           width: double.infinity,
           fit: BoxFit.cover,
-          placeholder: (context, url) => const SizedBox(height: 520),
-          errorWidget: (context, url, error) => const Icon(Icons.error_outline),
+          fallback: const Icon(Icons.error_outline),
         ),
         const SizedBox(height: 20),
         Row(
