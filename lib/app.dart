@@ -18,7 +18,6 @@ class MyApp extends StatelessWidget {
   final firebaseAuthRepo = FirebaseAuthRepo();
   final firebaseProfileRepo = FirebaseProfileRepo();
   final firebaseStorageRepo = FirebaseStorageRepo();
-
   final firebasePostRepo = FirebasePostRepo();
 
   @override

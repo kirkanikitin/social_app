@@ -168,16 +168,25 @@ class _ProfilePageState extends State<ProfilePage>
                             postCount: postCount,
                             followerCount: user.followers.length,
                             followingCount: user.following.length,
-                            onTap: () => PersistentNavBarNavigator.pushNewScreen(
-                              context,
-                              screen: FollowerPage(
-                                followers: user.followers,
-                                following: user.following,
-                                userName: user.name,
-                              ),
-                              withNavBar: false,
-                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                            ),
+                            onTap: () async {
+                              final result = await PersistentNavBarNavigator.pushNewScreen(
+                                context,
+                                screen: FollowerPage(
+                                  followers: user.followers,
+                                  following: user.following,
+                                  userName: user.name,
+                                ),
+                                withNavBar: false,
+                                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                              );
+
+                              final removed = result as List<String>?; // <-- тут уже преобразуем
+                              if (removed != null && removed.isNotEmpty && mounted) {
+                                setState(() {
+                                  user.following.removeWhere((uid) => removed.contains(uid));
+                                });
+                              }
+                            },
                         ),
                       ],
                     ),

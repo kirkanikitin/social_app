@@ -40,7 +40,6 @@ class _UserTileState extends State<UserTile> {
         profileUser.followers.remove(currentUser!.uid);
         if (!widget.isFollowerTab) {
           widget.onUnfollow?.call(); // сразу удаляем из списка
-          profileCubit.updateProfile(uid: currentUser!.uid); // обновляем профиль текущего пользователя
         }
       } else {
         profileUser.followers.add(currentUser!.uid);

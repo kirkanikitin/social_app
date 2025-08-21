@@ -22,6 +22,7 @@ class FollowerPage extends StatefulWidget {
 class _FollowerPageState extends State<FollowerPage> {
   late List<String> followersUids;
   late List<String> followingUids;
+  final Set<String> _removedFollowing = <String>{};
 
   @override
   void initState() {
@@ -33,12 +34,19 @@ class _FollowerPageState extends State<FollowerPage> {
   void removeFromFollowing(String uid) {
     setState(() {
       followingUids.remove(uid);
+      _removedFollowing.add(uid);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return PopScope<List<String>>(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, List<String>? result) {
+      if (didPop) return;
+      Navigator.of(context).pop(_removedFollowing.toList());
+    },
+    child: DefaultTabController(
         length: 2,
         child: Scaffold(
           appBar: AppBar(
@@ -87,6 +95,7 @@ class _FollowerPageState extends State<FollowerPage> {
               ]
           ),
         )
+      )
     );
   }
 

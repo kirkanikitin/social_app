@@ -11,7 +11,6 @@ import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/post/presentation/cubits/post-states.dart';
 import 'package:social_app/features/profile/domain/entities/profile-user.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import '../../../profile/presentation/components/safe-image.dart';
 
