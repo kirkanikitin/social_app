@@ -14,11 +14,13 @@ class UserTile extends StatefulWidget {
   final ProfileUser user;
   final bool isFollowerTab;
   final VoidCallback? onUnfollow;
+  final VoidCallback? onProfileClosed;
   const UserTile({
     super.key,
     required this.user,
     required this.isFollowerTab,
     this.onUnfollow,
+    this.onProfileClosed,
   });
 
   @override
@@ -97,12 +99,16 @@ class _UserTileState extends State<UserTile> {
         leftRight: 20,
         isFollowing: widget.user.followers.contains(currentUser!.uid),
       ),
-      onTap: () => PersistentNavBarNavigator.pushNewScreen(
-        context,
-        screen: ProfilePage(uid: widget.user.uid),
-        withNavBar: false,
-        pageTransitionAnimation: PageTransitionAnimation.cupertino,
-      ),
+      onTap: () {
+        PersistentNavBarNavigator.pushNewScreen(
+          context,
+          screen: ProfilePage(uid: widget.user.uid),
+          withNavBar: false,
+          pageTransitionAnimation: PageTransitionAnimation.cupertino,
+        ).then((_) {
+          widget.onProfileClosed?.call();
+        });
+      },
     );
   }
 }

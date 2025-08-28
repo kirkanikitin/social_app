@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/profile/presentation/components/user-tile.dart';
 import '../../domain/entities/profile-user.dart';
 import '../cubits/profile-cubit.dart';
@@ -23,6 +24,8 @@ class _FollowerPageState extends State<FollowerPage> {
   late List<String> followersUids;
   late List<String> followingUids;
   final Set<String> _removedFollowing = <String>{};
+  late ProfileCubit profileCubit = context.read<ProfileCubit>();
+  late AuthCubit authCubit = context.read<AuthCubit>();
 
   @override
   void initState() {
@@ -36,6 +39,18 @@ class _FollowerPageState extends State<FollowerPage> {
       followingUids.remove(uid);
       _removedFollowing.add(uid);
     });
+  }
+
+  Future<void> _refreshUserLists() async {
+    final updated =
+    await profileCubit.getUserProfile(authCubit.currentUser!.uid);
+
+    if (updated != null && mounted) {
+      setState(() {
+        followersUids = List.from(updated.followers);
+        followingUids = List.from(updated.following);
+      });
+    }
   }
 
   @override
@@ -56,6 +71,13 @@ class _FollowerPageState extends State<FollowerPage> {
               style: const TextStyle(
                   fontWeight: FontWeight.w700
               ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new),
+              onPressed: () {
+                profileCubit.fetchUserProfile(authCubit.currentUser!.uid);
+                Navigator.of(context).pop(_removedFollowing.toList());
+              },
             ),
             bottom: TabBar(
                 labelColor: Colors.black,
@@ -122,6 +144,7 @@ class _FollowerPageState extends State<FollowerPage> {
                 onUnfollow: !isFollowerTab
                     ? () => removeFromFollowing(user.uid)
                     : null,
+                onProfileClosed: _refreshUserLists,
               );
             } else if (snapshot.connectionState ==
                 ConnectionState.waiting) {
