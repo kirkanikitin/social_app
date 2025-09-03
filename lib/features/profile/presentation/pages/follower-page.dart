@@ -141,6 +141,9 @@ class _FollowerPageState extends State<FollowerPage> {
               return UserTile(
                 user: user,
                 isFollowerTab: isFollowerTab,
+                mode: isFollowerTab
+                    ? UserTileMode.delete
+                    : UserTileMode.follower,
                 onUnfollow: !isFollowerTab
                     ? () => removeFromFollowing(user.uid)
                     : null,

@@ -7,18 +7,28 @@ import 'package:social_app/features/profile/presentation/components/safe-image.d
 import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
+import '../../../search/presentation/cubit/search-history-cubit.dart';
 import '../cubits/profile-cubit.dart';
 import 'follow-button.dart';
+
+enum UserTileMode {
+  plain,      // без trailing
+  history,    // Cancel (удалить из истории)
+  delete,     // MyButtonPage Delete
+  follower,   // Follow/Unfollow
+}
 
 class UserTile extends StatefulWidget {
   final ProfileUser user;
   final bool isFollowerTab;
+  final UserTileMode mode;
   final VoidCallback? onUnfollow;
   final VoidCallback? onProfileClosed;
   const UserTile({
     super.key,
     required this.user,
     required this.isFollowerTab,
+    this.mode = UserTileMode.plain,
     this.onUnfollow,
     this.onProfileClosed,
   });
@@ -61,6 +71,40 @@ class _UserTileState extends State<UserTile> {
     });
   }
 
+  Widget? _buildTrailing() {
+    switch (widget.mode) {
+      case UserTileMode.plain:
+        return null;
+
+      case UserTileMode.history:
+        return GestureDetector(
+          onTap: () {
+            context.read<SearchHistoryCubit>().removeFromHistory(widget.user.uid);
+          },
+          child: const Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Icon(Icons.close, size: 18, color: Colors.grey),
+          ),
+        );
+
+      case UserTileMode.delete:
+        return MyButtonPage(
+          title: 'Delete',
+          leftRight: 15,
+          onTab: () {
+
+          },
+        );
+
+      case UserTileMode.follower:
+        return FollowButton(
+          onPressed: followButtonPressed,
+          leftRight: 20,
+          isFollowing: widget.user.followers.contains(currentUser!.uid),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -86,20 +130,8 @@ class _UserTileState extends State<UserTile> {
           ),
         ],
       ),
-      trailing: widget.isFollowerTab
-          ? MyButtonPage(
-        title: 'Delete',
-        leftRight: 15,
-        onTab: () {
-
-        },
-      )
-          : FollowButton(
-        onPressed: followButtonPressed,
-        leftRight: 20,
-        isFollowing: widget.user.followers.contains(currentUser!.uid),
-      ),
-      onTap: () {
+      trailing: _buildTrailing(),
+      onTap: () async {
         PersistentNavBarNavigator.pushNewScreen(
           context,
           screen: ProfilePage(uid: widget.user.uid),

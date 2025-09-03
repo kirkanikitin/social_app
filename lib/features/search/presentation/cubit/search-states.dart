@@ -8,7 +8,6 @@ class SearchLoading extends SearchState {}
 
 class SearchLoaded extends SearchState {
   final List<ProfileUser?> users;
-
   SearchLoaded(this.users);
 }
 

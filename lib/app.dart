@@ -6,11 +6,15 @@ import 'package:social_app/features/post/data/firebase-post-repo.dart';
 import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/profile/data/firebase-profile-repo.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:social_app/features/search/data/firebase-search-repo.dart';
+import 'package:social_app/features/search/domain/search-repo.dart';
+import 'package:social_app/features/search/presentation/cubit/search-cubit.dart';
 import 'package:social_app/features/storage/data/firebase-storage-repo.dart';
 import 'package:social_app/home/presentation/components/navigation-bar.dart';
 import 'package:social_app/themes/light-mode.dart';
 import 'features/auth/presentation/cubits/auth_cubit.dart';
 import 'features/auth/presentation/pages/auth-page.dart';
+import 'features/search/presentation/cubit/search-history-cubit.dart';
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -19,6 +23,7 @@ class MyApp extends StatelessWidget {
   final firebaseProfileRepo = FirebaseProfileRepo();
   final firebaseStorageRepo = FirebaseStorageRepo();
   final firebasePostRepo = FirebasePostRepo();
+  final firebaseSearchRepo = FireBaseSearchRepo();
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,18 @@ class MyApp extends StatelessWidget {
                 postRepo: firebasePostRepo,
                 storageRepo: firebaseStorageRepo,
               ),
+          ),
+          BlocProvider<SearchHistoryCubit>(
+            create: (context) {
+              final authCubit = context.read<AuthCubit>();
+              return SearchHistoryCubit(
+                repo: firebaseSearchRepo,
+                currentUid: authCubit.currentUser!.uid,
+              )..loadHistory();
+            },
+          ),
+          BlocProvider<SearchCubit>(
+              create: (context) => SearchCubit(searchRepo: firebaseSearchRepo)
           ),
         ],
         child: MaterialApp(
