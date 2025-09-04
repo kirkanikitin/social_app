@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
 import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
+import 'package:social_app/features/search/presentation/pages/search-page.dart';
 import 'package:social_app/home/presentation/pages/home-page.dart';
 import '../../../features/auth/presentation/cubits/auth_cubit.dart';
 import '../../../features/profile/presentation/cubits/profile-cubit.dart';
@@ -63,7 +64,7 @@ class _HomeNavBarState extends State<HomeNavBar> {
     List<Widget> _buildScreens() {
       return [
         HomePage(controller: _controller,),
-        const Placeholder(),
+        const SearchPage(),
         Container(),
         ProfilePage(uid: uid),
       ];

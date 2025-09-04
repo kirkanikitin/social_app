@@ -39,7 +39,7 @@ class ProfileUser extends AppUser {
       'email': email,
       'name': name,
       'bio': bio,
-      'profileImageUrl': profileImageUrl,
+      'profileImageUrl': profileImageUrl ?? '',
       'followers': followers,
       'following': following,
     };
@@ -47,13 +47,17 @@ class ProfileUser extends AppUser {
 
   factory ProfileUser.fromJson(Map<String, dynamic> json) {
     return ProfileUser(
-        uid: json['uid'],
-        email: json['email'],
-        name: json['name'],
-        bio: json['bio'] ?? '',
-        profileImageUrl: json['profileImageUrl'] ?? '',
-        followers: List<String>.from(json['followers'] ?? []),
-        following: List<String>.from(json['following'] ?? []),
+      uid: (json['uid'] ?? '') as String,
+      name: (json['name'] ?? '') as String,
+      email: (json['email'] ?? '') as String,
+      bio: (json['bio'] ?? '') as String,
+      profileImageUrl: (json['profileImageUrl'] ?? '') as String,
+      followers: (json['followers'] != null)
+          ? List<String>.from(json['followers'])
+          : [],
+      following: (json['following'] != null)
+          ? List<String>.from(json['following'])
+          : [],
     );
   }
 }
