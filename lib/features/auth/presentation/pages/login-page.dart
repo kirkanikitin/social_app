@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_signin_button/button_list.dart';
+import 'package:flutter_signin_button/button_view.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/auth/presentation/pages/reset-password-page.dart';
 import 'package:social_app/features/auth/presentation/widgets/login-button.dart';
 import 'package:social_app/features/auth/presentation/widgets/text-field-eyes.dart';
 import 'package:social_app/features/auth/presentation/widgets/text-field.dart';
+
 
 class LoginPage extends StatefulWidget {
   final Function()? togglePages;
@@ -115,7 +118,35 @@ class _LoginpageState extends State<LoginPage> {
                   onTap: login,
                   text: 'Login'
               ),
-              const SizedBox(height: 100),
+              const SizedBox(height: 30),
+              GestureDetector(
+                onTap: () async {
+                  await context.read<AuthCubit>().loginWithGoogle();
+                },
+                child: Container(
+                  width: 50, // ширина круга
+                  height: 50, // высота круга
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white, // фон кнопки
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      'lib/assets/icons/google-logo.png', // твой логотип Google
+                      width: 24,
+                      height: 24,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
