@@ -1,11 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:social_app/features/auth/domain/repos/auth-repo.dart';
+import '../../profile/domain/entities/profile-user.dart';
 import '../domain/entities/app-user.dart';
 
 class FirebaseAuthRepo implements AuthRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+  bool _googleInitialized = false;
+
+  Future<void> _initGoogleSignIn() async {
+    if (!_googleInitialized) {
+      await googleSignIn.initialize();
+      _googleInitialized = true;
+    }
+  }
+
 
   @override
   Future<AppUser?> loginWithEmailPassword(String email, String password) async {
@@ -59,10 +71,58 @@ class FirebaseAuthRepo implements AuthRepo {
       throw Exception('Register failed: $e');
     }
   }
+
+  @override
+  Future<ProfileUser?> loginWithGoogle() async {
+    try {
+      await _initGoogleSignIn();
+
+      final GoogleSignInAccount? googleUser =
+      await googleSignIn.authenticate(); // ✅ вместо signIn()
+      if (googleUser == null) return null;
+
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
+
+      // ✅ в 7.x accessToken больше нет
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+      await firebaseAuth.signInWithCredential(credential);
+
+      final user = userCredential.user!;
+      final userDocRef = firebaseFirestore.collection("users").doc(user.uid);
+      final userDoc = await userDocRef.get();
+
+      if (!userDoc.exists) {
+        final newUser = ProfileUser(
+          uid: user.uid,
+          email: user.email ?? "",
+          name: user.displayName ?? "No Name",
+          bio: "",
+          profileImageUrl: user.photoURL ?? "", // 🔥 фото из Google
+          followers: [],
+          following: [],
+        );
+
+        await userDocRef.set(newUser.toJson());
+        return newUser;
+      } else {
+        return ProfileUser.fromJson(userDoc.data() as Map<String, dynamic>);
+      }
+    } catch (e) {
+      throw Exception("Google login failed: $e");
+    }
+  }
+
   @override
   Future<void> logout() async {
     await firebaseAuth.signOut();
+    await googleSignIn.disconnect();
   }
+
   @override
   Future<AppUser?> getCurrentUser() async {
     final firebaseUser = firebaseAuth.currentUser;
