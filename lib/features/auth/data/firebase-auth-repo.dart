@@ -9,45 +9,54 @@ class FirebaseAuthRepo implements AuthRepo {
 
   @override
   Future<AppUser?> loginWithEmailPassword(String email, String password) async {
-   try {
-    UserCredential userCredential = await firebaseAuth
-        .signInWithEmailAndPassword(email: email, password: password);
+    try {
+      UserCredential userCredential = await firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
-    DocumentSnapshot userDoc = await firebaseFirestore
-        .collection('users')
-        .doc(userCredential.user!.uid)
-        .get();
+      // Проверяем верификацию почты
+      if (!userCredential.user!.emailVerified) {
+        await firebaseAuth.signOut();
+        throw Exception("Please verify your email before logging in.");
+      }
 
-    AppUser user = AppUser(
+      DocumentSnapshot userDoc = await firebaseFirestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      AppUser user = AppUser(
         uid: userCredential.user!.uid,
         email: email,
         name: userDoc['name'],
-    );
-    return user;
-   }
-   catch (e) {
-     throw Exception('Login failed: $e');
-   }
+      );
+      return user;
+    } catch (e) {
+      throw Exception('Login failed: $e');
+    }
   }
+
   @override
   Future<AppUser?> registerWithEmailPassword(String name, String email, String password) async {
     try {
       UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
+      // Отправляем письмо для подтверждения
+      await userCredential.user!.sendEmailVerification();
+
       AppUser user = AppUser(
-          uid: userCredential.user!.uid,
-          email: email,
-          name: name,
+        uid: userCredential.user!.uid,
+        email: email,
+        name: name,
       );
 
       await firebaseFirestore.collection('users')
-          .doc(user.uid).set(user.toJson());
+          .doc(user.uid)
+          .set(user.toJson());
 
       return user;
-    }
-    catch (e) {
-      throw Exception('Login failed: $e');
+    } catch (e) {
+      throw Exception('Register failed: $e');
     }
   }
   @override
