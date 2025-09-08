@@ -3,7 +3,7 @@ import 'package:social_app/features/auth/domain/entities/app-user.dart';
 import 'package:social_app/features/auth/domain/repos/auth-repo.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth-states.dart';
 
-class AuthCubit extends Cubit<AuthState>{
+class AuthCubit extends Cubit<AuthState> {
   final AuthRepo authRepo;
   AppUser? _currentUser;
 
@@ -26,6 +26,7 @@ class AuthCubit extends Cubit<AuthState>{
     try {
       emit(AuthLoading());
       final user = await authRepo.loginWithEmailPassword(email, pw);
+
       if (user != null) {
         _currentUser = user;
         emit(Authenticated(user));
@@ -42,9 +43,11 @@ class AuthCubit extends Cubit<AuthState>{
     try {
       emit(AuthLoading());
       final user = await authRepo.registerWithEmailPassword(name, email, pw);
+
       if (user != null) {
         _currentUser = user;
-        emit(Authenticated(user));
+        emit(AuthError("Registration successful! Please check your email to verify your account."));
+        emit(Unauthenticated()); // пока не подтвердил почту
       } else {
         emit(Unauthenticated());
       }
@@ -58,5 +61,4 @@ class AuthCubit extends Cubit<AuthState>{
     authRepo.logout();
     emit(Unauthenticated());
   }
-
 }
