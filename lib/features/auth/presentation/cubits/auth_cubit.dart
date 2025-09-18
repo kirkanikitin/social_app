@@ -73,6 +73,21 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> checkNameAvailability(String name) async {
+    if (name.isEmpty) return;
+    try {
+      final taken = await authRepo.isNameTaken(name);
+      if (taken) {
+        emit(AuthError("This name is already taken"));
+      } else {
+        emit(NameAvailable());
+      }
+    } catch (e) {
+      emit(AuthError("Failed to check name availability"));
+    }
+  }
+
+
   Future<void> logout() async {
     authRepo.logout();
     emit(Unauthenticated());
