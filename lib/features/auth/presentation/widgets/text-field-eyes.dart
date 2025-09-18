@@ -17,7 +17,7 @@ class MyTextFieldEyes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 35),
       child: TextField(
         cursorColor: Theme.of(context).colorScheme.tertiaryFixed,
         textInputAction: TextInputAction.next,
@@ -26,11 +26,11 @@ class MyTextFieldEyes extends StatelessWidget {
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
-            borderRadius: BorderRadius.circular(17),
+            borderRadius: BorderRadius.circular(20),
           ),
           hintText: hintText,
           hintStyle: TextStyle(

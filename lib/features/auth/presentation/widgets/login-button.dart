@@ -14,12 +14,16 @@ class MyLoginButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 21),
+        padding: const EdgeInsets.symmetric(horizontal: 35),
         child: Container(
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            color: Colors.grey.shade400,
-            borderRadius: BorderRadius.circular(20)
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+            colors: [Colors.purple, Colors.pink],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
             ),
           child: Center(
             child: Text(
@@ -27,7 +31,7 @@ class MyLoginButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
+                color: Colors.grey.shade100,
               ),
             ),
           ),

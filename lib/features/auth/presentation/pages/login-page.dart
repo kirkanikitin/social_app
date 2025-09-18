@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_signin_button/button_list.dart';
-import 'package:flutter_signin_button/button_view.dart';
 import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:social_app/features/auth/presentation/pages/reset-password-page.dart';
 import 'package:social_app/features/auth/presentation/widgets/login-button.dart';
@@ -32,15 +30,15 @@ class _LoginpageState extends State<LoginPage> {
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(
-          const SnackBar(
-              content: Text(
-                  'Please enter your email and password',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
+        const SnackBar(
+          content: Text(
+            'Please enter your email and password',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w300,
+            ),
           ),
+        ),
       );
     }
   }
@@ -55,122 +53,148 @@ class _LoginpageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      resizeToAvoidBottomInset: true,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // снимаем фокус со всех полей
+        },
+        behavior: HitTestBehavior.translucent,
         child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 120),
-              const Image(
-                image: AssetImage('lib/assets/icons/icon.png'),
-                width: 160,
-              ),
-              const Text(
-                'Instagrym',
-                style: TextStyle(
-                  fontFamily: 'Billabong',
-                  fontSize: 45,
-                ),
-              ),
-              const SizedBox(height: 80),
-              Text(
-                'Log in to continue',
-                style: TextStyle(
-                  fontWeight: FontWeight.w300,
-                  fontSize: 17,
-                  color: Theme.of(context).colorScheme.secondaryFixed,
-                ),
-              ),
-              const SizedBox(height: 15),
-              MyTextField(
-                controller: emailController,
-                textCatapilization: TextCapitalization.none,
-                hintText: 'Email',
-                obcureText: false,
-              ),
-              const SizedBox(height: 10),
-              MyTextFieldEyes(
-                suffixIcon: togglePassword(),
-                controller: pwController,
-                hintText: 'Password',
-                obcureText: _isSecurePassword,
-              ),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(
-                      builder: (context) => const ResetPasswordPage()
-                    ),
-                  );
-                },
-                  child: const Padding(
-                    padding: EdgeInsets.only(left: 180),
-                    child: Text(
-                      'Forgot Your Password?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w300
-                      ),
-                    ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight, // растягиваем под экран
                   ),
-              ),
-              const SizedBox(height: 8),
-              MyLoginButton(
-                  onTap: login,
-                  text: 'Login'
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTap: () async {
-                  await context.read<AuthCubit>().loginWithGoogle();
-                },
-                child: Container(
-                  width: 50, // ширина круга
-                  height: 50, // высота круга
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white, // фон кнопки
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          const SizedBox(height: 100),
+                          const Image(
+                            image: AssetImage('lib/assets/icons/icon.png'),
+                            width: 160,
+                          ),
+                          const Text(
+                            'Instagrym',
+                            style: TextStyle(
+                              fontFamily: 'Billabong',
+                              fontSize: 45,
+                            ),
+                          ),
+                          const SizedBox(height: 80),
+                          Text(
+                            'Log in to continue',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                              fontSize: 17,
+                              color: Theme.of(context).colorScheme.secondaryFixed,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          MyTextField(
+                            controller: emailController,
+                            textCatapilization: TextCapitalization.none,
+                            hintText: 'Email',
+                            obcureText: false,
+                          ),
+                          const SizedBox(height: 10),
+                          MyTextFieldEyes(
+                            suffixIcon: togglePassword(),
+                            controller: pwController,
+                            hintText: 'Password',
+                            obcureText: _isSecurePassword,
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ResetPasswordPage(),
+                                ),
+                              );
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.only(left: 150),
+                              child: Text(
+                                'Forgot Your Password?',
+                                style: TextStyle(fontWeight: FontWeight.w300),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          MyLoginButton(
+                            onTap: login,
+                            text: 'Login',
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10, top: 40),
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                await context.read<AuthCubit>().loginWithGoogle();
+                              },
+                              child: Container(
+                                width: 45,
+                                height: 45,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Image.asset(
+                                    'lib/assets/icons/google-logo.png',
+                                    width: 24,
+                                    height: 24,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Dont you have an account?',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: widget.togglePages,
+                                  child: const Text(
+                                    ' Register',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  child: Center(
-                    child: Image.asset(
-                      'lib/assets/icons/google-logo.png', // твой логотип Google
-                      width: 24,
-                      height: 24,
-                    ),
-                  ),
                 ),
-              ),
-              const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Dont you have an account?',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: widget.togglePages,
-                      child: const Text(
-                        ' Register',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-            ],
+              );
+            },
           ),
         ),
       ),

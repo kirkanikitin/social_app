@@ -18,7 +18,6 @@ class FirebaseAuthRepo implements AuthRepo {
     }
   }
 
-
   @override
   Future<AppUser?> loginWithEmailPassword(String email, String password) async {
     try {
@@ -78,13 +77,12 @@ class FirebaseAuthRepo implements AuthRepo {
       await _initGoogleSignIn();
 
       final GoogleSignInAccount? googleUser =
-      await googleSignIn.authenticate(); // ✅ вместо signIn()
+      await googleSignIn.authenticate();
       if (googleUser == null) return null;
 
       final GoogleSignInAuthentication googleAuth =
       await googleUser.authentication;
 
-      // ✅ в 7.x accessToken больше нет
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
@@ -102,7 +100,7 @@ class FirebaseAuthRepo implements AuthRepo {
           email: user.email ?? "",
           name: user.displayName ?? "No Name",
           bio: "",
-          profileImageUrl: user.photoURL ?? "", // 🔥 фото из Google
+          profileImageUrl: user.photoURL ?? "",
           followers: [],
           following: [],
         );
@@ -115,6 +113,16 @@ class FirebaseAuthRepo implements AuthRepo {
     } catch (e) {
       throw Exception("Google login failed: $e");
     }
+  }
+
+  @override
+  Future<bool> isNameTaken(String name) async {
+    final query = await firebaseFirestore
+        .collection('users')
+        .where('name', isEqualTo: name)
+        .get();
+
+    return query.docs.isNotEmpty;
   }
 
   @override

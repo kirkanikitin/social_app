@@ -12,5 +12,5 @@ ThemeData lightMode = ThemeData(
     secondaryFixed: Colors.grey.shade800,
     secondaryContainer: Colors.grey.shade900,
   ),
-      scaffoldBackgroundColor: Colors.grey.shade200,
+      scaffoldBackgroundColor: Colors.white,
 );

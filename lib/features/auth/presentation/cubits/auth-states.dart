@@ -11,6 +11,8 @@ class Authenticated extends AuthState {
   Authenticated(this.user);
 }
 
+class NameAvailable extends AuthState {}
+
 class Unauthenticated extends AuthState {}
 
 class AuthError extends AuthState {

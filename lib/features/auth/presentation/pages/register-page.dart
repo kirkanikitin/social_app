@@ -20,13 +20,21 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final pwController = TextEditingController();
 
-  void register() {
-    final String name = nameController.text.trim();
+  void register() async {
+    final String name = nameController.text.trim().toLowerCase();
     final String email = emailController.text.trim();
     final String pw = pwController.text.trim();
     final authCubit = context.read<AuthCubit>();
 
     if (email.isNotEmpty && name.isNotEmpty && pw.isNotEmpty) {
+      final isTaken = await context.read<AuthCubit>().authRepo.isNameTaken(name);
+      if (isTaken) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('This name is already taken')),
+        );
+        return;
+      }
+
       authCubit.register(name, email, pw);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,6 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
@@ -56,81 +65,105 @@ class _RegisterPageState extends State<RegisterPage> {
             );
           }
         },
-        child: SingleChildScrollView(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(), // закрываем клавиатуру
+          behavior: HitTestBehavior.translucent,
           child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 120),
-                const Image(
-                  image: AssetImage('lib/assets/icons/icon.png'),
-                  width: 160,
-                ),
-                const Text(
-                  'Instagrym',
-                  style: TextStyle(
-                    fontFamily: 'Billabong',
-                    fontSize: 45,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Text(
-                  'Register to continue',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w300,
-                    fontSize: 17,
-                    color: Theme.of(context).colorScheme.secondaryFixed,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                MyTextField(
-                  controller: nameController,
-                  textCatapilization: TextCapitalization.sentences,
-                  hintText: 'Name',
-                  obcureText: false,
-                ),
-                const SizedBox(height: 10),
-                MyTextField(
-                  controller: emailController,
-                  textCatapilization: TextCapitalization.none,
-                  hintText: 'Email',
-                  obcureText: false,
-                ),
-                const SizedBox(height: 10),
-                MyTextFieldEyes(
-                  suffixIcon: togglePassword(),
-                  controller: pwController,
-                  hintText: 'Password',
-                  obcureText: _isSecurePassword,
-                ),
-                const SizedBox(height: 15),
-                MyLoginButton(
-                  onTap: register,
-                  text: 'Register',
-                ),
-                const SizedBox(height: 100),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Do you already have an account?',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w300,
-                      ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                    GestureDetector(
-                      onTap: widget.togglePages,
-                      child: const Text(
-                        ' Log in',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.blue),
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Верхний блок: логотип, поля, кнопка
+                        Column(
+                          children: [
+                            const SizedBox(height: 100),
+                            const Image(
+                              image: AssetImage('lib/assets/icons/icon.png'),
+                              width: 160,
+                            ),
+                            const Text(
+                              'Instagrym',
+                              style: TextStyle(
+                                fontFamily: 'Billabong',
+                                fontSize: 45,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Text(
+                              'Register to continue',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 17,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryFixed,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            MyTextField(
+                              controller: nameController,
+                              textCatapilization: TextCapitalization.none,
+                              hintText: 'Name',
+                              obcureText: false,
+                            ),
+                            const SizedBox(height: 10),
+                            MyTextField(
+                              controller: emailController,
+                              textCatapilization: TextCapitalization.none,
+                              hintText: 'Email',
+                              obcureText: false,
+                            ),
+                            const SizedBox(height: 10),
+                            MyTextFieldEyes(
+                              suffixIcon: togglePassword(),
+                              controller: pwController,
+                              hintText: 'Password',
+                              obcureText: _isSecurePassword,
+                            ),
+                            const SizedBox(height: 15),
+                            MyLoginButton(
+                              onTap: register,
+                              text: 'Register',
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10, top: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Do you already have an account?',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: widget.togglePages,
+                                child: const Text(
+                                  ' Log in',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                );
+              },
             ),
           ),
         ),

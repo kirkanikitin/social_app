@@ -1,4 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class LowerCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    return newValue.copyWith(
+      text: newValue.text.toLowerCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class MyTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -17,8 +31,9 @@ class MyTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 35),
       child: TextField(
+        inputFormatters: [LowerCaseTextFormatter()],
         cursorColor: Theme.of(context).colorScheme.tertiaryFixed,
         textCapitalization: textCatapilization,
         textInputAction: TextInputAction.next,
@@ -27,11 +42,11 @@ class MyTextField extends StatelessWidget {
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
-            borderRadius: BorderRadius.circular(17),
+            borderRadius: BorderRadius.circular(20),
           ),
             hintText: hintText,
             hintStyle: TextStyle(
