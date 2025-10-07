@@ -43,134 +43,139 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final historyCubit = context.watch<SearchHistoryCubit>();
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade200,
-        toolbarHeight: 70,
-        title: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 15),
-            child: TextField(
-              cursorColor: Theme.of(context).colorScheme.tertiaryFixed,
-              textInputAction: TextInputAction.next,
-              controller: searchController,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                icon: const Icon(Icons.search_sharp),
-                hintText: 'Search',
-                hintStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.secondaryFixed,
-                  fontWeight: FontWeight.w500
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(), // закрываем клавиатуру
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+          toolbarHeight: 70,
+          title: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15),
+              child: TextField(
+                cursorColor: Theme.of(context).colorScheme.tertiaryFixed,
+                textInputAction: TextInputAction.next,
+                controller: searchController,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  icon: Icon(
+                      Icons.search_sharp,
+                      color: Theme.of(context).colorScheme.secondaryFixed,
+                  ),
+                  hintText: 'Search',
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.secondaryFixed,
+                    fontWeight: FontWeight.w500
+                  ),
+                  iconColor: Colors.black54,
                 ),
-                iconColor: Colors.black54,
               ),
             ),
           ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: Divider(
-            height: 1,
-            thickness: 1,
-            color: Theme.of(context).colorScheme.tertiary,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Divider(
+              height: 1,
+              thickness: 1,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
           ),
         ),
-      ),
-      body: BlocBuilder<SearchCubit, SearchState>(
-        builder: (context, state) {
-          /// если поле пустое → показываем историю
-          if (searchController.text.isEmpty) {
-            final historyState = context.watch<SearchHistoryCubit>().state;
+        body: BlocBuilder<SearchCubit, SearchState>(
+          builder: (context, state) {
+            if (searchController.text.isEmpty) {
+              final historyState = context.watch<SearchHistoryCubit>().state;
 
-            if (historyState is SearchHistoryLoaded) {
-              final history = historyState.history;
+              if (historyState is SearchHistoryLoaded) {
+                final history = historyState.history;
 
-              if (history.isEmpty) {
-                return const Center(child: Text('The story is empty'));
+                if (history.isEmpty) {
+                  return const Center(child: Text('The story is empty'));
+                }
+
+                return ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                           Text(
+                            'Recent',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).colorScheme.secondaryContainer,
+                            )
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context, MaterialPageRoute(
+                                  builder: (context) => const HistoryPage()
+                                ),
+                              );
+                            },
+                            child: const Text(
+                                'All',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue,
+                                )
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...history.map((u) => UserTile(
+                      user: u,
+                      isFollowerTab: false,
+                      mode: UserTileMode.history,
+                      onProfileClosed: () {
+                        context.read<SearchHistoryCubit>().addToHistory(u);
+                      },
+                    )),
+                  ]
+                );
+              }
+
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            /// когда есть активный поиск
+            if (state is SearchLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is SearchLoaded) {
+              if (state.users.isEmpty) {
+                return const Center(child: Text('The user was not found'));
               }
 
               return ListView(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Recent',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                          )
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context, MaterialPageRoute(
-                                builder: (context) => const HistoryPage()
-                              ),
-                            );
-                          },
-                          child: const Text(
-                              'All',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.blue,
-                              )
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ...history.map((u) => UserTile(
-                    user: u,
-                    isFollowerTab: false,
-                    mode: UserTileMode.history,
-                    onProfileClosed: () {
-                      context.read<SearchHistoryCubit>().addToHistory(u);
-                    },
-                  )),
-                ]
+                children: state.users
+                    .map((u) => UserTile(
+                  user: u!,
+                  isFollowerTab: false,
+                  mode: UserTileMode.plain,
+                  /// добавляем в историю при переходе в профиль
+                  onProfileClosed: () {
+                    context.read<SearchHistoryCubit>().addToHistory(u);
+                  },
+                )).toList(),
               );
+            } else if (state is SearchError) {
+              return Center(child: Text('Error: ${state.message}'));
             }
 
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          /// когда есть активный поиск
-          if (state is SearchLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is SearchLoaded) {
-            if (state.users.isEmpty) {
-              return const Center(child: Text('The user was not found'));
-            }
-
-            return ListView(
-              children: state.users
-                  .map((u) => UserTile(
-                user: u!,
-                isFollowerTab: false,
-                mode: UserTileMode.plain,
-                /// добавляем в историю при переходе в профиль
-                onProfileClosed: () {
-                  context.read<SearchHistoryCubit>().addToHistory(u);
-                },
-              )).toList(),
-            );
-          } else if (state is SearchError) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-
-          return const SizedBox.shrink();
-        },
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

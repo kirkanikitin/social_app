@@ -7,11 +7,10 @@ import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
 import 'package:social_app/features/profile/data/firebase-profile-repo.dart';
 import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
 import 'package:social_app/features/search/data/firebase-search-repo.dart';
-import 'package:social_app/features/search/domain/search-repo.dart';
 import 'package:social_app/features/search/presentation/cubit/search-cubit.dart';
 import 'package:social_app/features/storage/data/firebase-storage-repo.dart';
 import 'package:social_app/home/presentation/components/navigation-bar.dart';
-import 'package:social_app/themes/light-mode.dart';
+import 'package:social_app/themes/theme-cubit.dart';
 import 'features/auth/presentation/cubits/auth_cubit.dart';
 import 'features/auth/presentation/pages/auth-page.dart';
 import 'features/search/presentation/cubit/search-history-cubit.dart';
@@ -57,43 +56,47 @@ class MyApp extends StatelessWidget {
           BlocProvider<SearchCubit>(
               create: (context) => SearchCubit(searchRepo: firebaseSearchRepo)
           ),
+          BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
         ],
-        child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: lightMode,
-            home: BlocConsumer<AuthCubit, AuthState>(
-              builder: (context, authState) {
-                print(authState);
-                if (authState is Unauthenticated) {
-                  return const AuthPage();
-                }
-                if (authState is Authenticated) {
-                  return HomeNavBar();
-                } else {
-                  return Scaffold(
-                    body: Center(
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).colorScheme.inverseSurface,
-                      ),
-                    ),
-                  );
-                }
-              },
-              listener: (context, state) {
-                if (state is AuthError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.message,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w300,
+        child: BlocBuilder<ThemeCubit, ThemeData>(
+            builder: (context, currentTheme) =>
+              MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  theme: currentTheme,
+                  home: BlocConsumer<AuthCubit, AuthState>(
+                    builder: (context, authState) {
+                      print(authState);
+                      if (authState is Unauthenticated) {
+                        return const AuthPage();
+                      }
+                      if (authState is Authenticated) {
+                        return HomeNavBar();
+                      } else {
+                        return Scaffold(
+                          body: Center(
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context).colorScheme.inverseSurface,
+                            ),
                           ),
-                        ),
-                      )
-                  );
-                }
-              },
-            )
+                        );
+                      }
+                    },
+                    listener: (context, state) {
+                      if (state is AuthError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(state.message,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            )
+                        );
+                      }
+                    },
+                  )
+              )
         )
     );
   }

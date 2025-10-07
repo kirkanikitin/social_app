@@ -65,6 +65,7 @@ class _FollowerPageState extends State<FollowerPage> {
         length: 2,
         child: Scaffold(
           appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
             centerTitle: true,
             title: Text(
               widget.userName,

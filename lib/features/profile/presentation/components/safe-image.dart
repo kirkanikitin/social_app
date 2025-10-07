@@ -29,7 +29,7 @@ Widget avatarFromUrl({
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(size / 2),
-        border: Border.all(color: Theme.of(context).colorScheme.inversePrimary),
+        border: Border.all(color: Colors.grey.shade500),
       ),
       child: Icon(Icons.person,
           size: size * 0.58,

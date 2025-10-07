@@ -23,8 +23,6 @@ class _MyPostState extends State<MyPost> {
 
           return GridView.builder(
             padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               mainAxisSpacing: 2,
@@ -51,9 +49,7 @@ class _MyPostState extends State<MyPost> {
                   child: CachedNetworkImage(
                     imageUrl: post.imageUrl,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[300],
-                    ),
+                    placeholder: (context, url) => Container(color: Colors.grey[300]),
                     errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
                 ),

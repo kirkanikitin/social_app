@@ -16,7 +16,8 @@ class TextFieldComment extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50),
-            color: Colors.grey.shade300
+            color: Theme.of(context).colorScheme.primaryContainer,
+            border: Border.all(color: Theme.of(context).colorScheme.surface)
         ),
         child: Row(
           children: [
@@ -28,12 +29,12 @@ class TextFieldComment extends StatelessWidget {
                   controller: controller,
                   textCapitalization: TextCapitalization.sentences,
                   obscureText: false,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       hintText: 'Add a comment',
                       border: InputBorder.none,
                       hintStyle: TextStyle(
                           fontWeight: FontWeight.w400,
-                          color: Colors.black87
+                          color: Theme.of(context).colorScheme.primaryFixed
                       )
                   ),
                 ),
@@ -47,7 +48,7 @@ class TextFieldComment extends StatelessWidget {
               child: IconButton(
                 icon: Icon(
                   Icons.arrow_upward_rounded,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Colors.grey.shade200,
                 ),
                 onPressed: () {
                   addComment();

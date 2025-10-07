@@ -93,7 +93,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         title: const Text(
                 'Edit Profile',
                 style: TextStyle(
@@ -113,11 +113,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).colorScheme.tertiary,
+          ),
+        ),
       ),
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: 25),
                   Container(
                     height: 100,
                     width: 100,

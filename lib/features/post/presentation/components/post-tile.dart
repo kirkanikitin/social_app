@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,9 +15,52 @@ import 'package:social_app/home/presentation/components/more-menu.dart';
 import 'package:social_app/features/post/presentation/components/comment-bottom-sheet.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import 'dart:ui';
-
 import '../../../profile/presentation/components/safe-image.dart';
 
+class PostImage extends StatelessWidget {
+  final String imageUrl;
+  final bool useHero;
+  final String heroTag;
+  final double aspectRatio;
+
+  const PostImage({
+    super.key,
+    required this.imageUrl,
+    required this.aspectRatio,
+    this.useHero = false,
+    this.heroTag = '',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final maxHeight = MediaQuery.of(context).size.height * 0.6;
+
+    Widget image = LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        double height = width / aspectRatio;
+
+        if (height > maxHeight) {
+          height = maxHeight;
+        }
+
+        return SizedBox(
+          width: width,
+          height: height,
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+          ),
+        );
+      },
+    );
+
+    if (useHero) {
+      return Hero(tag: heroTag, child: image);
+    }
+    return image;
+  }
+}
 
 class PostTile extends StatefulWidget {
   final Post post;
@@ -34,9 +79,11 @@ class PostTile extends StatefulWidget {
   State<PostTile> createState() => _PostTileState();
 }
 
-class _PostTileState extends State<PostTile> {
+class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin {
   late final postCubit = context.read<PostCubit>();
   late final profileCubit = context.read<ProfileCubit>();
+  late AnimationController _controller;
+  late Animation<double> _scale;
 
   bool isOwnPost = false;
 
@@ -46,6 +93,13 @@ class _PostTileState extends State<PostTile> {
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _scale = Tween(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
     getCurrentUser();
     fetchPostUser();
   }
@@ -73,6 +127,7 @@ class _PostTileState extends State<PostTile> {
       if (isLiked) {
         widget.post.likes.remove(currentUser!.uid);
       } else {
+        _controller.forward().then((_) => _controller.reverse());
         widget.post.likes.add(currentUser!.uid);
       }
     });
@@ -226,14 +281,15 @@ class _PostTileState extends State<PostTile> {
                   avatarFromUrl(
                     context: context,
                     url: postUser?.profileImageUrl,
-                    size: 50,
+                    size: 40,
                   ),
-                  const SizedBox(width: 15),
+                  const SizedBox(width: 10),
                   Text(
                     widget.post.userName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.secondaryContainer
                     ),
                   ),
                 ],
@@ -252,70 +308,85 @@ class _PostTileState extends State<PostTile> {
         ),
         const SizedBox(height: 10),
         widget.showHero
-            ? Hero(
-          tag: 'post_${widget.post.id}',
-          child: safeNetworkImage(
-            context: context,
-            url: widget.post.imageUrl,
-            height: 510,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            fallback: const Icon(Icons.error_outline),
-          ),
+            ? PostImage(
+          imageUrl: widget.post.imageUrl,
+          aspectRatio: widget.post.aspectRatio,
+          useHero: true,
+          heroTag: 'post_${widget.post.id}',
         )
-            : safeNetworkImage(
-          context: context,
-          url: widget.post.imageUrl,
-          height: 510,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          fallback: const Icon(Icons.error_outline),
+            : PostImage(
+          imageUrl: widget.post.imageUrl,
+          aspectRatio: widget.post.aspectRatio,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         Row(
           children: [
-            const SizedBox(width: 15),
+            const SizedBox(width: 10),
             SizedBox(
               width: 50,
               child: Row(
                 children: [
                   GestureDetector(
                       onTap: toggleLikePost,
-                      child: Icon(
-                        widget.post.likes.contains(currentUser!.uid)
-                            ? Icons.favorite
-                            : Icons.favorite_outline,
-                        size: 32,
-                        color: widget.post.likes.contains(currentUser!.uid)
-                         ? Colors.red
-                         : Colors.black
+                      child: ScaleTransition(
+                        scale: _scale,
+                        child: widget.post.likes.contains(currentUser!.uid)
+                          ?
+                          const Image(
+                            image: AssetImage('lib/assets/icons/red-heart.png'),
+                            height: 25,
+                            color: Colors.redAccent,
+                          ) :
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 9, right: 8),
+                            child: ImageFiltered(
+                              imageFilter: ImageFilter.matrix(
+                                Matrix4.diagonal3Values(1.5, 1.5, 1).storage,
+                              ),
+                              child: Image.asset(
+                                  'lib/assets/icons/heart2.png',
+                                  height: 17,
+                                  color: Theme.of(context).colorScheme.secondaryContainer
+                              ),
+                            ),
+                          )
                       )
                   ),
                   const SizedBox(width: 5),
                   Text(
                     widget.post.likes.length.toString(),
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 15),
-            GestureDetector(
-              onTap: openNewCommentBox,
-              child: const Icon(
-                Icons.mode_comment_outlined,
-                  size: 30
+            Padding(
+              padding: const EdgeInsets.only(bottom: 9, right: 8),
+              child: GestureDetector(
+                onTap: openNewCommentBox,
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.matrix(
+                    Matrix4.diagonal3Values(1.5, 1.5, 1).storage,
+                  ),
+                  child: Image.asset(
+                      'lib/assets/icons/comment.png',
+                      height: 20,
+                      color: Theme.of(context).colorScheme.secondaryContainer
+                  ),
+                )
+
               ),
             ),
             const SizedBox(width: 5),
             Text(
               widget.post.comments.length.toString(),
               style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600
               ),
             ),
             const Spacer(),
@@ -325,6 +396,7 @@ class _PostTileState extends State<PostTile> {
                 formattedDate,
                 style: TextStyle(
                   fontWeight: FontWeight.w300,
+                  fontSize: 12,
                   color: Theme.of(context).colorScheme.inversePrimary
                 ),
               ),
