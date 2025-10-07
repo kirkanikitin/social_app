@@ -24,16 +24,16 @@ class MyTextFieldEdit extends StatelessWidget {
         textInputAction: TextInputAction.next,
         maxLines: 5,
         minLines: 2,
-        maxLength: 50,
+        maxLength: 150,
         controller: controller,
         obscureText: obcureText,
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
+            borderSide: BorderSide(color: Colors.grey.shade700),
             borderRadius: BorderRadius.circular(20),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
+            borderSide: BorderSide(color: Colors.grey.shade700),
             borderRadius: BorderRadius.circular(17),
           ),
           hintText: hintText,

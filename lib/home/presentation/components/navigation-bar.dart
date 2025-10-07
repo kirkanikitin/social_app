@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:social_app/features/post/presentation/pages/photo-editor-page.dart';
 import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
 import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
 import 'package:social_app/features/search/presentation/pages/search-page.dart';
@@ -26,32 +27,28 @@ class _HomeNavBarState extends State<HomeNavBar> {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.home_filled),
-        iconSize: 30,
-        title: ("Home"),
-        activeColorPrimary: Colors.black87,
-        inactiveColorPrimary: Colors.black54,
+        icon: const Icon(Icons.home_filled),
+        iconSize: 27,
+        activeColorPrimary: Theme.of(context).colorScheme.primaryFixed,
+        inactiveColorPrimary: Theme.of(context).colorScheme.primaryFixedDim,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.search),
-        iconSize: 30,
-        title: ("Search"),
-        activeColorPrimary: Colors.black87,
-        inactiveColorPrimary: Colors.black54,
+        icon: const Icon(Icons.search),
+        iconSize: 27,
+        activeColorPrimary: Theme.of(context).colorScheme.primaryFixed,
+        inactiveColorPrimary: Theme.of(context).colorScheme.primaryFixedDim,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.add),
-        iconSize: 30,
-        title: ("To Create"),
-        activeColorPrimary: Colors.black87,
-        inactiveColorPrimary: Colors.black54,
+        icon: const Icon(Icons.add),
+        iconSize: 27,
+        activeColorPrimary: Theme.of(context).colorScheme.primaryFixed,
+        inactiveColorPrimary: Theme.of(context).colorScheme.primaryFixedDim,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.person_outline),
-        iconSize: 30,
-        title: ("Profile"),
-        activeColorPrimary: Colors.black87,
-        inactiveColorPrimary: Colors.black54,
+        icon: const Icon(Icons.person_outline),
+        iconSize: 27,
+        activeColorPrimary: Theme.of(context).colorScheme.primaryFixed,
+        inactiveColorPrimary: Theme.of(context).colorScheme.primaryFixedDim,
       ),
     ];
   }
@@ -76,17 +73,13 @@ class _HomeNavBarState extends State<HomeNavBar> {
       items: _navBarsItems(),
       isVisible: true,
       decoration: NavBarDecoration(
-        border: Border.all(color: Colors.grey.shade300)
+        border: Border.symmetric(horizontal: BorderSide(color: Theme.of(context).colorScheme.secondaryFixedDim))
       ),
       onItemSelected: (index) async {
         if (index == 2) {
           await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => UploadPostPage(
-                onPostUploaded: () {
-                  _controller.index = 0;
-                },
-              ),
+              builder: (_) => const PhotoEditorPage()
             ),
           );
           _controller.index = 0;
@@ -111,8 +104,8 @@ class _HomeNavBarState extends State<HomeNavBar> {
       resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen on a non-scrollable screen when keyboard appears. Default is true.
       stateManagement: true, // Default is true.
       hideNavigationBarWhenKeyboardAppears: true,
-      padding: const EdgeInsets.only(top: 15),
-      backgroundColor: Colors.grey.shade100,
+      padding: const EdgeInsets.only(top: 10),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       animationSettings: const NavBarAnimationSettings(
         navBarItemAnimation: ItemAnimationSettings( // Navigation Bar's items animation properties.
           duration: Duration(milliseconds: 400),
@@ -125,7 +118,7 @@ class _HomeNavBarState extends State<HomeNavBar> {
         ),
       ),
       confineToSafeArea: true,
-      navBarHeight: kBottomNavigationBarHeight,
+      navBarHeight: 40,
       navBarStyle: NavBarStyle.style12,
     );
   }

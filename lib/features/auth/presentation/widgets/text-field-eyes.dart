@@ -25,11 +25,11 @@ class MyTextFieldEyes extends StatelessWidget {
         obscureText: obcureText,
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
+            borderSide: BorderSide(color: Colors.grey.shade700),
             borderRadius: BorderRadius.circular(25),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.tertiaryFixed),
+            borderSide: BorderSide(color: Colors.grey.shade700),
             borderRadius: BorderRadius.circular(20),
           ),
           hintText: hintText,

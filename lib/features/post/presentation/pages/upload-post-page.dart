@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:file_picker/file_picker.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/features/auth/domain/entities/app-user.dart';
@@ -14,9 +12,12 @@ import '../../../profile/presentation/cubits/profile-cubit.dart';
 import '../../../profile/presentation/cubits/profile-states.dart';
 
 class UploadPostPage extends StatefulWidget {
+  final Uint8List editedImage;
   final VoidCallback? onPostUploaded;
+
   const UploadPostPage({
     super.key,
+    required this.editedImage,
     required this.onPostUploaded,
   });
 
@@ -25,11 +26,7 @@ class UploadPostPage extends StatefulWidget {
 }
 
 class _UploadPostPageState extends State<UploadPostPage> {
-
-  PlatformFile? imagePickedFile;
-  Uint8List? webImage;
   final textController = TextEditingController();
-
   AppUser? currentUser;
 
   @override
@@ -45,32 +42,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
   }
 
-  Future<void> pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: kIsWeb,
-    );
-    if (result != null) {
-      setState(() {
-        imagePickedFile = result.files.first;
-        if (kIsWeb) {
-          webImage = imagePickedFile!.bytes;
-        }
-      });
-    }
-  }
-
   void uploadPost() async {
     getCurrentUser();
-
-    if (imagePickedFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Both image and caption are required'),
-        ),
-      );
-      return;
-    }
 
     final profileState = context.read<ProfileCubit>().state;
     String profileImageUrl = '';
@@ -78,6 +51,10 @@ class _UploadPostPageState extends State<UploadPostPage> {
     if (profileState is ProfileLoaded) {
       profileImageUrl = profileState.profileUser.profileImageUrl;
     }
+
+    final ui.Image decodedImage = await decodeImageFromList(widget.editedImage);
+    final int imageWidth = decodedImage.width;
+    final int imageHeight = decodedImage.height;
 
     final newPost = Post(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -88,41 +65,27 @@ class _UploadPostPageState extends State<UploadPostPage> {
       timestamp: DateTime.now(),
       likes: [],
       comments: [],
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
     );
 
     final postCubit = context.read<PostCubit>();
-    if (kIsWeb) {
-      postCubit.createPost(newPost, imageBytes: imagePickedFile?.bytes);
-    } else {
-      postCubit.createPost(newPost, imagePath: imagePickedFile?.path);
-    }
-  }
-
-  @override
-  void dispose() {
-    textController.dispose();
-    super.dispose();
+    postCubit.createPost(newPost, imageBytes: widget.editedImage);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<PostCubit,PostState>(
+    return BlocConsumer<PostCubit, PostState>(
       builder: (context, state) {
-        print(state);
         if (state is PostsLoading || state is PostUploading) {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.inverseSurface,
-              ),
-            ),
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           );
         }
         return buildUploadPage();
       },
       listener: (context, state) {
         if (state is PostsLoaded) {
-          print(state);
           if (widget.onPostUploaded != null) {
             widget.onPostUploaded!();
           }
@@ -131,65 +94,56 @@ class _UploadPostPageState extends State<UploadPostPage> {
       },
     );
   }
+
   Widget buildUploadPage() {
-    return Scaffold(
-      appBar: AppBar(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(), // закрываем клавиатуру
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
           centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.primary,
           title: const Text(
             'New publication',
             style: TextStyle(
               fontWeight: FontWeight.w600,
             ),
           ),
+
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton(
-                onPressed: uploadPost,
-                icon: const Icon(
-                  Icons.check_sharp,
-                  size: 30,
-                  color: Colors.blue,
-                ),
+            IconButton(
+              onPressed: uploadPost,
+              icon: const Icon(
+                Icons.check_sharp,
+                size: 30,
+                color: Colors.blue,
               ),
             ),
-          ]
-      ),
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              if (kIsWeb && webImage != null)
-                Image.memory(webImage!),
-              if (!kIsWeb && imagePickedFile != null)
-                Image.file(
-                  height: 400,
-                  width: 500,
-                  File(imagePickedFile!.path!)),
-              const Spacer(),
-              GestureDetector(
-                onTap: pickImage,
-                child: const Text(
-                  'Select Images',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blue
-                  ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Divider(
+              height: 1,
+              thickness: 1,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                Image.memory(widget.editedImage, height: 400, fit: BoxFit.cover),
+                const SizedBox(height: 50),
+                MyTextFieldEdit(
+                  controller: textController,
+                  textCatapilization: TextCapitalization.sentences,
+                  hintText: 'Add a description',
+                  obcureText: false,
                 ),
-              ),
-              const SizedBox(height: 20),
-              MyTextFieldEdit(
-                controller: textController,
-                textCatapilization: TextCapitalization.sentences,
-                hintText: 'Add descriptions',
-                obcureText: false,
-              ),
-              const SizedBox(height: 20),
-            ],
+              ],
+            ),
           ),
         ),
       ),

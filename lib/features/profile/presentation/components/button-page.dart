@@ -18,7 +18,7 @@ class MyButtonPage extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Theme.of(context).colorScheme.secondary
+            color: Theme.of(context).colorScheme.surface
         ),
         child: GestureDetector(
           onTap: onTab,

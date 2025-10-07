@@ -42,13 +42,13 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     final Duration diff = DateTime.now().difference(dateTime);
 
     if (diff.inSeconds < 60) {
-      return 'только что';
+      return 'just now';
     } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} мин назад';
+      return '${diff.inMinutes} min ago';
     } else if (diff.inHours < 24) {
-      return '${diff.inHours} ч назад';
+      return '${diff.inHours} hours ago';
     } else if (diff.inDays < 7) {
-      return '${diff.inDays} дн назад';
+      return '${diff.inDays} days ago';
     } else {
       return DateFormat('dd.MM.yyyy').format(dateTime);
     }
@@ -229,7 +229,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         Align(
           alignment: Alignment.bottomCenter,
           child: Material(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
             child: Container(
               padding: MediaQuery.of(context).viewInsets,
@@ -249,7 +249,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                           height: 4,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(25),
-                            color: Colors.grey[300],
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
                       ),

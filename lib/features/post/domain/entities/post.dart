@@ -10,6 +10,8 @@ class Post {
   final DateTime timestamp;
   final List<String> likes;
   final List<Comment> comments;
+  final int imageWidth;
+  final int imageHeight;
 
 Post({
   required this.id,
@@ -20,7 +22,12 @@ Post({
   required this.timestamp,
   required this.likes,
   required this.comments,
+  required this.imageWidth,
+  required this.imageHeight,
 });
+
+  double get aspectRatio =>
+      (imageHeight != 0) ? imageWidth / imageHeight : 1.0;
 
   Post copyWith({String? imageUrl, String? profileImageUrl}) {
     return Post(
@@ -32,6 +39,8 @@ Post({
       timestamp: timestamp,
       likes: likes,
       comments: comments,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
     );
   }
 
@@ -45,6 +54,8 @@ Post({
       'timestamp': Timestamp.fromDate(timestamp),
       'likes': likes,
       'comments': comments.map((comment) => comment.toJson()).toList(),
+      'imageWidth': imageWidth,
+      'imageHeight': imageHeight,
     };
   }
 
@@ -63,6 +74,12 @@ Post({
         timestamp: (json['timestamp'] as Timestamp).toDate(),
         likes: List<String>.from(json['likes'] ?? []),
         comments: comments,
+        imageWidth: (json['imageWidth'] is int)
+            ? json['imageWidth'] as int
+            : int.tryParse((json['imageWidth'] ?? '1').toString()) ?? 1,
+        imageHeight: (json['imageHeight'] is int)
+            ? json['imageHeight'] as int
+            : int.tryParse((json['imageHeight'] ?? '1').toString()) ?? 1,
     );
   }
 }
