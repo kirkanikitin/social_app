@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/profile/presentation/pages/post-profile-view.dart';
+import 'package:instagrym/features/profile/presentation/pages/post-profile-view.dart';
 import '../../../post/presentation/cubits/post-cubit.dart';
 import '../../../post/presentation/cubits/post-states.dart';
 

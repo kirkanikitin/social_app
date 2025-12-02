@@ -1,4 +1,4 @@
-import 'package:social_app/features/auth/domain/entities/app-user.dart';
+import 'package:instagrym/features/auth/domain/entities/app-user.dart';
 
 class ProfileUser extends AppUser {
   final String bio;

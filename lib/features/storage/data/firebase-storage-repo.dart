@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:social_app/features/storage/domain/storage-repo.dart';
+import 'package:instagrym/features/storage/domain/storage-repo.dart';
 
 class FirebaseStorageRepo implements StorageRepo {
   final FirebaseStorage storage = FirebaseStorage.instance;

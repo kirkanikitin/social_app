@@ -5,6 +5,7 @@ class MyTextFieldEdit extends StatelessWidget {
   final textCatapilization;
   final String hintText;
   final bool obcureText;
+  final int maxLength;
 
   const MyTextFieldEdit({
     super.key,
@@ -12,6 +13,7 @@ class MyTextFieldEdit extends StatelessWidget {
     required this.textCatapilization,
     required this.hintText,
     required this.obcureText,
+    required this.maxLength
   });
 
   @override
@@ -24,7 +26,7 @@ class MyTextFieldEdit extends StatelessWidget {
         textInputAction: TextInputAction.next,
         maxLines: 5,
         minLines: 2,
-        maxLength: 150,
+        maxLength: maxLength,
         controller: controller,
         obscureText: obcureText,
         decoration: InputDecoration(

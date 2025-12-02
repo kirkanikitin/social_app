@@ -1,11 +1,10 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
-import 'package:social_app/features/post/presentation/cubits/post-states.dart';
-import 'package:social_app/features/post/presentation/components/post-tile.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-cubit.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-states.dart';
+import 'package:instagrym/features/post/presentation/components/post-tile.dart';
 import '../../../features/auth/presentation/cubits/auth_cubit.dart';
 
 class HomePage extends StatefulWidget {

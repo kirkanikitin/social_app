@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../post/presentation/components/post-tile.dart';
 import '../../../post/domain/entities/post.dart';
+import '../../../post/presentation/cubits/post-cubit.dart';
 
 class PostPageView extends StatefulWidget {
   final List<Post> posts;
@@ -18,7 +20,9 @@ class _PostPageViewState extends State<PostPageView> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: widget.initialIndex);
+    _pageController = PageController(
+      initialPage: widget.initialIndex,
+    );
   }
 
   @override
@@ -34,23 +38,30 @@ class _PostPageViewState extends State<PostPageView> {
         controller: _pageController,
         scrollDirection: Axis.vertical,
         itemCount: widget.posts.length,
-        itemBuilder: (context, index) {
-          final post = widget.posts[index];
-          return SafeArea(
-            child: PostTile(
-              post: post,
-              showHero: true,
-              onDeletePressed: () {
-                setState(() {
-                  widget.posts.removeAt(index);
-                });
-                if (widget.posts.isEmpty) {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          );
-        },
+          itemBuilder: (context, index) {
+            final post = widget.posts[index];
+
+            return Transform.translate(
+              offset: const Offset(0, 140), // сдвиг на 1 пиксель
+              child: PostTile(
+                post: post,
+                showHero: true,
+                onDeletePressed: () async {
+                  final postCubit = context.read<PostCubit>();
+                  await postCubit.deletePost(post.id);
+                  await postCubit.fetchAllPosts();
+
+                  setState(() {
+                    widget.posts.removeAt(index);
+                  });
+
+                  if (widget.posts.isEmpty) {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            );
+          }
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/profile/presentation/components/user-tile.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/profile/presentation/components/user-tile.dart';
 import '../../domain/entities/profile-user.dart';
 import '../cubits/profile-cubit.dart';
 

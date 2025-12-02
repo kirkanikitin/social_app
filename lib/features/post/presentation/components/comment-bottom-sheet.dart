@@ -2,17 +2,20 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:instagrym/features/post/domain/entities/post.dart';
 import 'package:intl/intl.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/post/domain/entities/comment.dart';
-import 'package:social_app/features/post/domain/entities/post.dart';
-import 'package:social_app/features/post/presentation/components/text-field-comment.dart';
-import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
-import 'package:social_app/features/post/presentation/cubits/post-states.dart';
-import 'package:social_app/features/profile/domain/entities/profile-user.dart';
-import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/post/domain/entities/comment.dart';
+import 'package:instagrym/features/post/domain/entities/post.dart';
+import 'package:instagrym/features/post/presentation/components/text-field-comment.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-cubit.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-states.dart';
+import 'package:instagrym/features/profile/domain/entities/profile-user.dart';
+import 'package:instagrym/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import '../../../profile/presentation/components/safe-image.dart';
+import '../../domain/entities/comment.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   final Post post;
@@ -291,12 +294,16 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                         future: profileCubit.getUserProfile(comment.userId),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return Container(
-                                              height: 40,
-                                              width: 10,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(12),
-                                                color: Colors.grey.shade200,
+                                            return Shimmer.fromColors(
+                                              baseColor: Colors.grey.shade200,
+                                              highlightColor: Colors.white,
+                                              child: Container(
+                                                width: 10,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  color: Colors.grey.shade200,
+                                                ),
                                               ),
                                             );
                                           }

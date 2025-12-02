@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 bool isValidHttpUrl(String? url) {
   if (url == null) return false;
@@ -47,14 +48,12 @@ Widget avatarFromUrl({
         image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
       ),
     ),
-    placeholder: (context, _) => SizedBox(
-      height: size,
-      width: size,
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Theme.of(context).colorScheme.inverseSurface,
-        ),
+    placeholder: (context, _) => Shimmer.fromColors(
+      baseColor: Colors.grey.shade200,
+      highlightColor: Colors.white,
+      child: SizedBox(
+        width: size,
+        height: size,
       ),
     ),
     errorWidget: (context, _, __) => Container(

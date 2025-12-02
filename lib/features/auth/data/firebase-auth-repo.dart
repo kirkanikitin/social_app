@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:social_app/features/auth/domain/repos/auth-repo.dart';
+import 'package:instagrym/features/auth/domain/repos/auth-repo.dart';
 import '../../profile/domain/entities/profile-user.dart';
 import '../domain/entities/app-user.dart';
 

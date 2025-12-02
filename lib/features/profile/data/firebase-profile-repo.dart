@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:social_app/features/profile/domain/repos/profile-repo.dart';
+import 'package:instagrym/features/profile/domain/repos/profile-repo.dart';
 import '../domain/entities/profile-user.dart';
 
 class FirebaseProfileRepo implements ProfileRepo {

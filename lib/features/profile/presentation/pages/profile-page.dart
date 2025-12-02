@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:social_app/features/auth/domain/entities/app-user.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/post/presentation/pages/photo-editor-page.dart';
-import 'package:social_app/features/profile/presentation/components/bio-box.dart';
-import 'package:social_app/features/profile/presentation/components/button-page.dart';
-import 'package:social_app/features/profile/presentation/components/follow-button.dart';
-import 'package:social_app/features/profile/presentation/components/profile-stats.dart';
-import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
-import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
-import 'package:social_app/features/profile/presentation/pages/drawer-page.dart';
-import 'package:social_app/features/profile/presentation/pages/post-profile.dart';
+import 'package:instagrym/features/auth/domain/entities/app-user.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/post/presentation/pages/photo-editor-page.dart';
+import 'package:instagrym/features/profile/presentation/components/bio-box.dart';
+import 'package:instagrym/features/profile/presentation/components/button-page.dart';
+import 'package:instagrym/features/profile/presentation/components/follow-button.dart';
+import 'package:instagrym/features/profile/presentation/components/profile-stats.dart';
+import 'package:instagrym/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:instagrym/features/profile/presentation/cubits/profile-states.dart';
+import 'package:instagrym/features/profile/presentation/pages/drawer-page.dart';
+import 'package:instagrym/features/profile/presentation/pages/post-profile.dart';
 import '../../../post/presentation/cubits/post-cubit.dart';
 import '../components/safe-image.dart';
 import 'edit-profile-page.dart';
@@ -37,7 +38,7 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(_SliverTabBarDelegate oldDelegate) {
-    return false;
+    return tabBar != oldDelegate.tabBar;
   }
 }
 
@@ -84,8 +85,10 @@ class _ProfilePageState extends State<ProfilePage>
     setState(() {
       if (isFollowing) {
         profileUser.followers.remove(currentUser!.uid);
+        HapticFeedback.mediumImpact();
       } else {
         profileUser.followers.add(currentUser!.uid);
+        HapticFeedback.mediumImpact();
       }
     });
 

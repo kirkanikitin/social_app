@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/search/domain/search-repo.dart';
+import 'package:instagrym/features/search/domain/search-repo.dart';
 import '../../../profile/domain/entities/profile-user.dart';
 
 abstract class SearchHistoryState {}

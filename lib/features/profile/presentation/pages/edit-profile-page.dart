@@ -4,10 +4,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/profile/domain/entities/profile-user.dart';
-import 'package:social_app/features/profile/presentation/components/text-field-edit.dart';
-import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
-import 'package:social_app/features/profile/presentation/cubits/profile-states.dart';
+import 'package:instagrym/features/profile/domain/entities/profile-user.dart';
+import 'package:instagrym/features/profile/presentation/components/text-field-edit.dart';
+import 'package:instagrym/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:instagrym/features/profile/presentation/cubits/profile-states.dart';
 
 import '../components/safe-image.dart';
 
@@ -175,6 +175,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               textCatapilization: TextCapitalization.sentences,
               hintText: widget.user.bio,
               obcureText: false,
+              maxLength: 150,
             )
           ],
         ),

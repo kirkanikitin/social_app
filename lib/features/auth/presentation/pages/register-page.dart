@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
 import '../widgets/login-button.dart';
 import '../widgets/text-field-eyes.dart';
 import '../widgets/text-field.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth-states.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth-states.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? togglePages;

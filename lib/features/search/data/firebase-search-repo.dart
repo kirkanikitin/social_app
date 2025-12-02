@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:social_app/features/profile/domain/entities/profile-user.dart';
-import 'package:social_app/features/search/domain/search-repo.dart';
+import 'package:instagrym/features/profile/domain/entities/profile-user.dart';
+import 'package:instagrym/features/search/domain/search-repo.dart';
 
 class FireBaseSearchRepo implements SearchRepo {
   final fireStore = FirebaseFirestore.instance;

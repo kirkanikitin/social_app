@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_editor_plus/image_editor_plus.dart';
-import 'package:social_app/features/post/presentation/pages/upload-post-page.dart';
+import 'package:instagrym/features/post/presentation/pages/upload-post-page.dart';
 
 class PhotoEditorPage extends StatefulWidget {
   const PhotoEditorPage({super.key});

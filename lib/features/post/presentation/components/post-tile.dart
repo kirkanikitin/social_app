@@ -1,21 +1,86 @@
 import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/post/domain/entities/post.dart';
-import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
-import 'package:social_app/features/profile/domain/entities/profile-user.dart';
-import 'package:social_app/features/profile/presentation/cubits/profile-cubit.dart';
-import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
-import 'package:social_app/home/presentation/components/more-menu.dart';
-import 'package:social_app/features/post/presentation/components/comment-bottom-sheet.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/post/domain/entities/post.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-cubit.dart';
+import 'package:instagrym/features/profile/domain/entities/profile-user.dart';
+import 'package:instagrym/features/profile/presentation/cubits/profile-cubit.dart';
+import 'package:instagrym/features/profile/presentation/pages/profile-page.dart';
+import 'package:instagrym/home/presentation/components/more-menu.dart';
+import 'package:instagrym/features/post/presentation/components/comment-bottom-sheet.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import 'dart:ui';
+import 'package:flutter/services.dart';
 import '../../../profile/presentation/components/safe-image.dart';
+
+class ExpandableText extends StatefulWidget {
+  final String text;
+  final int charLimit;
+  final TextStyle? style;
+
+  const ExpandableText({
+    super.key,
+    required this.text,
+    this.charLimit = 150, // лимит символов
+    this.style,
+  });
+
+  @override
+  State<ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<ExpandableText> {
+  late String shortText;
+  bool isExpanded = false;
+  bool shouldTrim = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.text.length > widget.charLimit) {
+      shouldTrim = true;
+      shortText = widget.text.substring(0, widget.charLimit) + "…";
+    } else {
+      shortText = widget.text;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isExpanded ? widget.text : shortText,
+          style: widget.style,
+        ),
+        if (shouldTrim)
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isExpanded = !isExpanded;
+              });
+            },
+            child: Text(
+              isExpanded ? "скрыть" : "ещё",
+              style: TextStyle(
+                color: Colors.grey.shade500,
+                fontSize: widget.style?.fontSize ?? 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          )
+      ],
+    );
+  }
+}
 
 class PostImage extends StatelessWidget {
   final String imageUrl;
@@ -40,25 +105,40 @@ class PostImage extends StatelessWidget {
         final width = constraints.maxWidth;
         double height = width / aspectRatio;
 
-        if (height > maxHeight) {
-          height = maxHeight;
-        }
+        if (height > maxHeight) height = maxHeight;
 
         return SizedBox(
           width: width,
           height: height,
-          child: Image.network(
-            imageUrl,
+
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
+
+            // 🔥 SHIMMER placeholder
+            placeholder: (context, url) => Shimmer.fromColors(
+              baseColor: Colors.grey.shade200,
+              highlightColor: Colors.white,
+              child: Container(
+                width: width,
+                height: height,
+                color: Colors.grey.shade200,
+              ),
+            ),
+
+            // ошибка загрузки
+            errorWidget: (context, url, error) => Container(
+              width: width,
+              height: height,
+              color: Colors.grey.shade300,
+              child: const Icon(Icons.image_not_supported, size: 40),
+            ),
           ),
         );
       },
     );
 
-    if (useHero) {
-      return Hero(tag: heroTag, child: image);
-    }
-    return image;
+    return useHero ? Hero(tag: heroTag, child: image) : image;
   }
 }
 
@@ -79,11 +159,16 @@ class PostTile extends StatefulWidget {
   State<PostTile> createState() => _PostTileState();
 }
 
-class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin {
+class _PostTileState extends State<PostTile> with TickerProviderStateMixin {
   late final postCubit = context.read<PostCubit>();
   late final profileCubit = context.read<ProfileCubit>();
   late AnimationController _controller;
   late Animation<double> _scale;
+  bool showBigHeart = false;
+  late AnimationController _bigHeartController;
+  late Animation<double> _bigHeartScale;
+  late Animation<double> _bigHeartOpacity;
+
 
   bool isOwnPost = false;
 
@@ -99,6 +184,18 @@ class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin
     );
     _scale = Tween(begin: 1.0, end: 1.3).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _bigHeartController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _bigHeartScale = Tween<double>(begin: 0.5, end: 1.2).animate(
+      CurvedAnimation(parent: _bigHeartController, curve: Curves.easeOutBack),
+    );
+
+    _bigHeartOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _bigHeartController, curve: Curves.easeOut),
     );
     getCurrentUser();
     fetchPostUser();
@@ -120,6 +217,21 @@ class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin
     }
   }
 
+  void handleDoubleTapLike() {
+    if (!widget.post.likes.contains(currentUser!.uid)) {
+      toggleLikePost();
+    }
+
+    setState(() => showBigHeart = true);
+    HapticFeedback.mediumImpact();
+
+    _bigHeartController.forward(from: 0).then((_) {
+      if (mounted) {
+        setState(() => showBigHeart = false);
+      }
+    });
+  }
+
   void toggleLikePost() {
     final isLiked = widget.post.likes.contains(currentUser!.uid);
 
@@ -129,6 +241,7 @@ class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin
       } else {
         _controller.forward().then((_) => _controller.reverse());
         widget.post.likes.add(currentUser!.uid);
+        HapticFeedback.mediumImpact();
       }
     });
 
@@ -213,6 +326,7 @@ class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     commentController.dispose();
+    _bigHeartController.dispose();
     super.dispose();
   }
 
@@ -307,16 +421,42 @@ class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin
           ],
         ),
         const SizedBox(height: 10),
-        widget.showHero
-            ? PostImage(
-          imageUrl: widget.post.imageUrl,
-          aspectRatio: widget.post.aspectRatio,
-          useHero: true,
-          heroTag: 'post_${widget.post.id}',
-        )
-            : PostImage(
-          imageUrl: widget.post.imageUrl,
-          aspectRatio: widget.post.aspectRatio,
+        GestureDetector(
+          onDoubleTap: handleDoubleTapLike,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              widget.showHero
+                  ? PostImage(
+                imageUrl: widget.post.imageUrl,
+                aspectRatio: widget.post.aspectRatio,
+                useHero: true,
+                heroTag: 'post_${widget.post.id}',
+              )
+                  : PostImage(
+                imageUrl: widget.post.imageUrl,
+                aspectRatio: widget.post.aspectRatio,
+              ),
+
+              if (showBigHeart)
+                AnimatedBuilder(
+                  animation: _bigHeartController,
+                  builder: (_, __) {
+                    return Opacity(
+                      opacity: _bigHeartOpacity.value,
+                      child: Transform.scale(
+                        scale: _bigHeartScale.value,
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: 120,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
         Row(
@@ -403,12 +543,21 @@ class _PostTileState extends State<PostTile> with SingleTickerProviderStateMixin
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Text(widget.post.text),
+            child: ExpandableText(
+              text: widget.post.text,
+              charLimit: 80,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.secondaryFixed,
+              ),
+            ),
+
           ),
         ),
       ],

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:social_app/features/profile/domain/entities/profile-user.dart';
-import 'package:social_app/features/profile/presentation/components/button-page.dart';
-import 'package:social_app/features/profile/presentation/components/safe-image.dart';
-import 'package:social_app/features/profile/presentation/pages/profile-page.dart';
+import 'package:instagrym/features/profile/domain/entities/profile-user.dart';
+import 'package:instagrym/features/profile/presentation/components/button-page.dart';
+import 'package:instagrym/features/profile/presentation/components/safe-image.dart';
+import 'package:instagrym/features/profile/presentation/pages/profile-page.dart';
 import '../../../auth/domain/entities/app-user.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
 import '../../../search/presentation/cubit/search-history-cubit.dart';
@@ -52,9 +53,11 @@ class _UserTileState extends State<UserTile> {
         profileUser.followers.remove(currentUser!.uid);
         if (!widget.isFollowerTab) {
           widget.onUnfollow?.call(); // сразу удаляем из списка
+          HapticFeedback.mediumImpact();
         }
       } else {
         profileUser.followers.add(currentUser!.uid);
+        HapticFeedback.mediumImpact();
       }
     });
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/auth/presentation/pages/reset-password-page.dart';
-import 'package:social_app/features/auth/presentation/widgets/login-button.dart';
-import 'package:social_app/features/auth/presentation/widgets/text-field-eyes.dart';
-import 'package:social_app/features/auth/presentation/widgets/text-field.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/auth/presentation/pages/reset-password-page.dart';
+import 'package:instagrym/features/auth/presentation/widgets/login-button.dart';
+import 'package:instagrym/features/auth/presentation/widgets/text-field-eyes.dart';
+import 'package:instagrym/features/auth/presentation/widgets/text-field.dart';
 
 
 class LoginPage extends StatefulWidget {

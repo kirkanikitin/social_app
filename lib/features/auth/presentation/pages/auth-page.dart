@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:social_app/features/auth/presentation/pages/login-page.dart';
-import 'package:social_app/features/auth/presentation/pages/register-page.dart';
+import 'package:instagrym/features/auth/presentation/pages/login-page.dart';
+import 'package:instagrym/features/auth/presentation/pages/register-page.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});

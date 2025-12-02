@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app/features/auth/presentation/widgets/text-field.dart';
+import 'package:instagrym/features/auth/presentation/widgets/text-field.dart';
 
 import '../widgets/login-button.dart';
 

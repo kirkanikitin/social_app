@@ -2,12 +2,12 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/auth/domain/entities/app-user.dart';
-import 'package:social_app/features/auth/presentation/cubits/auth_cubit.dart';
-import 'package:social_app/features/post/domain/entities/post.dart';
-import 'package:social_app/features/post/presentation/cubits/post-cubit.dart';
-import 'package:social_app/features/post/presentation/cubits/post-states.dart';
-import 'package:social_app/features/profile/presentation/components/text-field-edit.dart';
+import 'package:instagrym/features/auth/domain/entities/app-user.dart';
+import 'package:instagrym/features/auth/presentation/cubits/auth_cubit.dart';
+import 'package:instagrym/features/post/domain/entities/post.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-cubit.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-states.dart';
+import 'package:instagrym/features/profile/presentation/components/text-field-edit.dart';
 import '../../../profile/presentation/cubits/profile-cubit.dart';
 import '../../../profile/presentation/cubits/profile-states.dart';
 
@@ -141,6 +141,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                   textCatapilization: TextCapitalization.sentences,
                   hintText: 'Add a description',
                   obcureText: false,
+                  maxLength: 300,
                 ),
               ],
             ),

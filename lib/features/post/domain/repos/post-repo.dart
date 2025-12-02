@@ -1,5 +1,5 @@
-import 'package:social_app/features/post/domain/entities/comment.dart';
-import 'package:social_app/features/post/domain/entities/post.dart';
+import 'package:instagrym/features/post/domain/entities/comment.dart';
+import 'package:instagrym/features/post/domain/entities/post.dart';
 
 abstract class PostRepo {
   Future<List<Post>> fetchAllPosts();

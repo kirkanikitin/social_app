@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/search/presentation/cubit/search-states.dart';
+import 'package:instagrym/features/search/presentation/cubit/search-states.dart';
 import '../../domain/search-repo.dart';
 
 class SearchCubit extends Cubit<SearchState> {

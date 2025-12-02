@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app/features/post/domain/entities/comment.dart';
-import 'package:social_app/features/post/presentation/cubits/post-states.dart';
-import 'package:social_app/features/storage/domain/storage-repo.dart';
+import 'package:instagrym/features/post/domain/entities/comment.dart';
+import 'package:instagrym/features/post/presentation/cubits/post-states.dart';
+import 'package:instagrym/features/storage/domain/storage-repo.dart';
 import '../../domain/entities/post.dart';
 import '../../domain/repos/post-repo.dart';
 
@@ -59,7 +59,10 @@ class PostCubit extends Cubit<PostState> {
   Future<void> deletePost(String postId) async {
     try {
       await postRepo.deletePost(postId);
-    } catch (e) {}
+      await fetchAllPosts();
+    } catch (e) {
+      emit(PostsError('Failed to delete post: $e'));
+    }
   }
 
   void updatePostInState(Post updatedPost) {
